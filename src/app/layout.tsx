@@ -2,10 +2,17 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+<<<<<<< Updated upstream
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
+=======
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Navbar from "@/components/navbar";
+import NextAuthProvider from "@/providers/NextAuthProvider";
+>>>>>>> Stashed changes
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -24,10 +31,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+<<<<<<< Updated upstream
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+=======
+      <body className={`${poppins.variable}`}>
+        <NextAuthProvider>
+          <Navbar />
+          {children}
+
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+        </NextAuthProvider>
+>>>>>>> Stashed changes
       </body>
     </html>
   );
