@@ -1,22 +1,33 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { RiHome9Fill } from "react-icons/ri";
 
 export default function Navbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   return (
     <nav className="fixed top-0 left-0 w-full z-50 shadow-md bg-white">
-      <div className="grid grid-cols-3 items-center h-20 px-4 sm:px-6 md:px-[65px] gap-4">
-        <Link href="/" aria-label="Homepage" className="flex items-center">
+      <div className="flex items-center justify-between h-16 md:h-20 px-4 sm:px-6 md:px-[65px]">
+        <Link
+          href="/"
+          aria-label="Homepage"
+          className="flex items-center shrink-0"
+        >
           <div className="flex items-center flex-col">
-            <RiHome9Fill className="text-4xl text-[#064749]" />
-            <p className="text-[#064749] text-base font-light">FLEX LIVING</p>
+            <RiHome9Fill className="text-3xl md:text-4xl text-[#064749]" />
+            <p className="text-[#064749] text-xs md:text-base font-light">
+              FLEX LIVING
+            </p>
           </div>
         </Link>
 
-        <div className="flex items-center justify-center">
-          <div className="flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 rounded-l-full transition-colors">
+        <div className="flex items-center justify-center flex-1 mx-2 md:mx-4">
+          <div className="hidden xl:flex items-center bg-white border border-gray-300 rounded-full shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-50 rounded-l-full transition-colors">
               <svg
                 className="w-4 h-4 text-gray-500"
                 fill="none"
@@ -34,8 +45,8 @@ export default function Navbar() {
                 Select a city
               </span>
             </div>
-            <div className="h-8 w-px bg-gray-300"></div>
-            <div className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors">
+            <div className="h-6 w-px bg-gray-300"></div>
+            <div className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors">
               <svg
                 className="w-4 h-4 text-gray-500"
                 fill="none"
@@ -53,8 +64,8 @@ export default function Navbar() {
                 Move-in
               </span>
             </div>
-            <div className="h-8 w-px bg-gray-300"></div>
-            <div className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors">
+            <div className="h-6 w-px bg-gray-300"></div>
+            <div className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors">
               <svg
                 className="w-4 h-4 text-gray-500"
                 fill="none"
@@ -72,8 +83,8 @@ export default function Navbar() {
                 Move-out
               </span>
             </div>
-            <div className="h-8 w-px bg-gray-300"></div>
-            <div className="flex items-center gap-2 px-4 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors">
+            <div className="h-6 w-px bg-gray-300"></div>
+            <div className="flex items-center gap-2 px-4 py-2 cursor-pointer hover:bg-gray-50 transition-colors">
               <svg
                 className="w-4 h-4 text-gray-500"
                 fill="none"
@@ -90,35 +101,101 @@ export default function Navbar() {
               <span className="text-sm text-gray-600 whitespace-nowrap">
                 Guests
               </span>
-              <div className="flex items-center gap-1.5 ml-1">
-                <button className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-400 hover:shadow-md transition-all">
+              <div className="flex items-center gap-1.5 ml-2">
+                <button className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-400 hover:shadow-sm transition-all">
                   <span className="text-base leading-none pb-0.5">+</span>
                 </button>
                 <span className="text-sm font-medium text-gray-700 min-w-4 text-center">
                   1
                 </span>
-                <button className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-400 hover:shadow-md transition-all">
+                <button className="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:border-gray-400 hover:shadow-sm transition-all">
                   <span className="text-base leading-none pb-0.5">−</span>
                 </button>
               </div>
             </div>
-            <button className="bg-[#064749] text-white px-6 py-2.5 rounded-r-full hover:bg-[#053638] hover:shadow-lg transition-all font-medium text-sm">
+            <button className="bg-[#064749] text-white px-8 py-2 rounded-r-full hover:bg-[#053638] transition-all font-medium text-sm">
               Search
             </button>
           </div>
+
+          <button className="xl:hidden flex items-center gap-2 px-3 md:px-4 py-2 border border-gray-300 rounded-full hover:shadow-md transition-all bg-white relative z-10 cursor-pointer">
+            <svg
+              className="w-4 h-4 text-gray-500 pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <span className="text-xs md:text-sm text-gray-600 pointer-events-none">
+              Search
+            </span>
+          </button>
         </div>
 
-        <div className="flex items-center gap-4 justify-self-end">
-          <Link
-            href="/hosting"
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:shadow-md rounded-full transition-all"
-          >
-            <span>Switch to hosting</span>
-          </Link>
+        <div className="flex items-center gap-2 md:gap-4 shrink-0 relative z-20">
+          <div className="relative">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center gap-2 md:gap-3 pl-2 md:pl-3 pr-1.5 md:pr-2 py-1.5 md:py-2 border border-gray-300 rounded-full hover:shadow-md transition-all bg-white"
+            >
+              <svg
+                className="w-4 md:w-5 h-4 md:h-5 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+              <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#064749] flex items-center justify-center text-white font-semibold text-sm">
+                A
+              </div>
+            </button>
 
-          <button className="w-12 h-12 rounded-full bg-[#064749] flex items-center justify-center text-white font-semibold hover:bg-[#053638] hover:shadow-lg transition-all">
-            N
-          </button>
+            {isMenuOpen && (
+              <div className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-gray-200 py-2 z-50">
+                <div className="px-4 py-3 border-b border-gray-200">
+                  <div className="flex items-center gap-2 mb-3"></div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex items-start gap-3">
+                      <Link
+                        href="/become-host"
+                        className="flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                          Become a host
+                        </h3>
+                        <p className="text-xs text-gray-600">
+                          It&apos;s easy to start hosting and earn extra income.
+                        </p>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-1">
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Login or Register
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </nav>
