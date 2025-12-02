@@ -13,7 +13,6 @@ export default function Login() {
 
         <div className="card bg-white text-[#181A18] shadow-xl">
           <div className="card-body">
-            {/* Social Login Buttons */}
             <div className="space-y-3">
               <button className="btn btn-outline rounded-lg w-full gap-2">
                 <FaGoogle className="text-lg" />
@@ -29,10 +28,8 @@ export default function Login() {
               </button>
             </div>
 
-            {/* Divider */}
             <div className="divider text-gray-500">OR</div>
 
-            {/* Registration Form */}
             <form className="space-y-4">
               <div className="form-control">
                 <label className="label text-[#181A18]">
@@ -70,7 +67,6 @@ export default function Login() {
               </div>
             </form>
 
-            {/* Login Link */}
             <p className="text-center text-[#181A18] text-sm  mt-4">
               Haven't created an account?{" "}
               <a href="/register" className="link link-primary">
