@@ -196,18 +196,34 @@ export default function Navbar() {
                   <div className="flex items-center gap-2 mb-3"></div>
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-start gap-3">
-                      <Link
-                        href="/become-host"
-                        className="flex-1 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <h3 className="font-semibold text-gray-900 text-sm mb-1">
-                          Become a host
-                        </h3>
-                        <p className="text-xs text-gray-600">
-                          It&apos;s easy to start hosting and earn extra income.
-                        </p>
-                      </Link>
+                      {session?.user?.role === "ADMIN" ? (
+                        <Link
+                          href="/add-property"
+                          className="flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                            Add property to rent
+                          </h3>
+                          <p className="text-xs text-gray-600">
+                            List a new property for tenants to rent.
+                          </p>
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/become-tenant"
+                          className="flex-1 cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                            Become a tenant
+                          </h3>
+                          <p className="text-xs text-gray-600">
+                            It&apos;s easy to start hosting and earn extra
+                            income.
+                          </p>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
