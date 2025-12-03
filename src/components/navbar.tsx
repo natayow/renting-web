@@ -214,15 +214,24 @@ export default function Navbar() {
 
                 <div className="border-t border-gray-200 pt-1">
                   {session ? (
-                    <button
-                      onClick={() => {
-                        signOut({ callbackUrl: "/" });
-                        setIsMenuOpen(false);
-                      }}
-                      className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      Logout
-                    </button>
+                    <>
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        onClick={() => {
+                          signOut({ callbackUrl: "/" });
+                          setIsMenuOpen(false);
+                        }}
+                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        Logout
+                      </button>
+                    </>
                   ) : (
                     <Link
                       href="/login"
