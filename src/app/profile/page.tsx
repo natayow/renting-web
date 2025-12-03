@@ -123,6 +123,19 @@ export default function ProfilePage() {
       .slice(0, 2);
   };
 
+  const getRoleBadgeStyle = (role: string) => {
+    switch (role?.toUpperCase()) {
+      case "ADMIN":
+        return "px-4 py-1.5 bg-linear-to-r from-purple-500 to-purple-600 text-white rounded-full text-sm font-semibold shadow-md border-2 border-purple-300";
+      case "TENANT":
+        return "px-4 py-1.5 bg-linear-to-r from-blue-500 to-blue-600 text-white rounded-full text-sm font-semibold shadow-md border-2 border-blue-300";
+      case "USER":
+        return "px-4 py-1.5 bg-linear-to-r from-green-500 to-green-600 text-white rounded-full text-sm font-semibold shadow-md border-2 border-green-300";
+      default:
+        return "px-4 py-1.5 bg-linear-to-r from-gray-500 to-gray-600 text-white rounded-full text-sm font-semibold shadow-md border-2 border-gray-300";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
@@ -134,22 +147,44 @@ export default function ProfilePage() {
                 {profile && getInitials(profile.fullName)}
               </div>
               <div className="flex-1 text-center sm:text-left mb-4 sm:mb-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                  {profile?.fullName}
-                </h1>
-                <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-600">
-                  <span className="px-3 py-1 bg-[#064749] bg-opacity-10 text-[#064749] rounded-full text-sm font-medium capitalize">
+                <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                    {profile?.fullName}
+                  </h1>
+                  <span className={getRoleBadgeStyle(profile?.role || "")}>
                     {profile?.role}
                   </span>
+                </div>
+                <div className="flex items-center justify-center sm:justify-start gap-2 text-gray-600">
                   <span className="text-sm">
                     Member since {formatDate(profile?.createdAt)}
                   </span>
                 </div>
               </div>
-              <button className="px-6 py-3 bg-[#064749] text-white rounded-full hover:bg-[#053638] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
-                <FaEdit />
-                Edit Profile
-              </button>
+              <div className="flex gap-3">
+                {profile?.role?.toUpperCase() === "USER" && (
+                  <button className="px-6 py-3 bg-linear-to-r from-[#064749] to-[#0a9399] text-white rounded-full hover:from-[#053638] hover:to-[#087174] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                      />
+                    </svg>
+                    Become a Tenant
+                  </button>
+                )}
+                <button className="px-6 py-3 bg-[#064749] text-white rounded-full hover:bg-[#053638] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                  <FaEdit />
+                  Edit Profile
+                </button>
+              </div>
             </div>
           </div>
         </div>
