@@ -4,10 +4,38 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { RiHome9Fill } from "react-icons/ri";
+import { useSession, signOut } from "next-auth/react";
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Get the first letter of the user's full name or show profile icon
+  const renderAvatar = () => {
+    if (session?.user?.fullName) {
+      return (
+        <span className="text-white font-semibold text-sm">
+          {session.user.fullName.charAt(0).toUpperCase()}
+        </span>
+      );
+    }
+    return (
+      <svg
+        className="w-4 h-4 md:w-5 md:h-5 text-white"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        />
+      </svg>
+    );
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 shadow-md bg-white">
@@ -157,8 +185,8 @@ export default function Navbar() {
                   d="M4 6h16M4 12h16M4 18h16"
                 />
               </svg>
-              <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#064749] flex items-center justify-center text-white font-semibold text-sm">
-                A
+              <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-[#064749] flex items-center justify-center">
+                {renderAvatar()}
               </div>
             </button>
 
@@ -185,13 +213,25 @@ export default function Navbar() {
                 </div>
 
                 <div className="border-t border-gray-200 pt-1">
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  >
-                    Login or Register
-                  </Link>
+                  {session ? (
+                    <button
+                      onClick={() => {
+                        signOut({ callbackUrl: "/" });
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  ) : (
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="block w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      Login or Register
+                    </Link>
+                  )}
                 </div>
               </div>
             )}
