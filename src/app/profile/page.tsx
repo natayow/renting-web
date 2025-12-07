@@ -339,11 +339,14 @@ export default function ProfilePage() {
               </div>
 
               <div className="grid sm:grid-cols-3 gap-4 mb-6">
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
+                <button
+                  onClick={() => router.push("/admin/properties/new")}
+                  className="bg-white rounded-xl p-4 shadow-sm border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-200 group cursor-pointer transform hover:scale-105"
+                >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-500 transition-colors duration-200">
                       <svg
-                        className="w-5 h-5 text-purple-600"
+                        className="w-5 h-5 text-purple-600 group-hover:text-white transition-colors duration-200"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -356,14 +359,16 @@ export default function ProfilePage() {
                         />
                       </svg>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Add New</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        Properties
+                    <div className="text-left">
+                      <p className="text-sm text-gray-600 group-hover:text-purple-600 transition-colors duration-200">
+                        Add New
+                      </p>
+                      <p className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors duration-200">
+                        Property
                       </p>
                     </div>
                   </div>
-                </div>
+                </button>
 
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
                   <div className="flex items-center gap-3">
@@ -420,7 +425,7 @@ export default function ProfilePage() {
 
               <button
                 onClick={() => router.push("/admin/properties")}
-                className="w-full py-4 bg-linear-to-r from-purple-600 via-purple-700 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:via-purple-800 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 font-semibold text-lg group"
+                className="w-full py-4 bg-linear-to-r from-purple-600 via-purple-700 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:via-purple-800 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 font-semibold text-lg group mb-4"
               >
                 <svg
                   className="w-6 h-6 group-hover:scale-110 transition-transform"
