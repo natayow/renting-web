@@ -6,7 +6,6 @@ import axiosInstance from "@/utils/axiosInstance";
 import Image from "next/image";
 import Link from "next/link";
 
-// Type definitions based on your Prisma schema
 interface PropertyImage {
   id: string;
   url: string;
@@ -63,7 +62,6 @@ export default function PropertyList() {
       setLoading(true);
       setError(null);
 
-      // Fetch only ACTIVE properties
       const response = await axiosInstance.get<ApiResponse>("/api/properties", {
         params: {
           status: "ACTIVE",
@@ -182,7 +180,7 @@ export default function PropertyList() {
               <div className="relative w-full aspect-square rounded-2xl overflow-hidden bg-gray-200">
                 {property.images && property.images.length > 0 ? (
                   <Image
-                    src={`http://localhost:8000/uploads/${property.images[0].url}`}
+                    src={`http://localhost:8000/uploads/images/${property.images[0].url}`}
                     alt={property.title}
                     fill
                     unoptimized
