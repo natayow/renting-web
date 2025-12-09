@@ -50,6 +50,10 @@ export const createPropertySchema = Yup.object({
   status: Yup.string()
     .oneOf(["DRAFT", "ACTIVE", "INACTIVE"], "Invalid status")
     .required("Status is required"),
+  facilityIds: Yup.array()
+    .of(Yup.string())
+    .min(3, "Please select at least 3 facilities")
+    .required("Facilities are required"),
 });
 
 export interface CreatePropertyFormData {
@@ -67,4 +71,5 @@ export interface CreatePropertyFormData {
   maxNights: number;
   basePricePerNightIdr: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
+  facilityIds: string[];
 }

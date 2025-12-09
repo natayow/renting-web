@@ -18,6 +18,7 @@ import {
   FaCalendarAlt,
   FaImage,
   FaMapMarkerAlt,
+  FaCheckCircle,
 } from "react-icons/fa";
 
 interface PropertyType {
@@ -25,10 +26,17 @@ interface PropertyType {
   name: string;
 }
 
+interface Facility {
+  id: string;
+  name: string;
+  icon?: string;
+}
+
 export default function NewPropertyPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [propertyTypes, setPropertyTypes] = useState<PropertyType[]>([]);
+  const [facilities, setFacilities] = useState<Facility[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -50,11 +58,17 @@ export default function NewPropertyPage() {
       maxNights: 30,
       basePricePerNightIdr: 0,
       status: "DRAFT",
+      facilityIds: [],
     },
     validationSchema: createPropertySchema,
     onSubmit: async (values) => {
       if (selectedImages.length === 0) {
         alert("Please upload at least one image");
+        return;
+      }
+
+      if (values.facilityIds.length < 3) {
+        alert("Please select at least 3 facilities");
         return;
       }
 
@@ -82,6 +96,13 @@ export default function NewPropertyPage() {
           values.basePricePerNightIdr.toString()
         );
         formData.append("status", values.status);
+
+        // Add facility IDs
+        if (values.facilityIds && values.facilityIds.length > 0) {
+          values.facilityIds.forEach((facilityId) => {
+            formData.append("facilityIds[]", facilityId);
+          });
+        }
 
         selectedImages.forEach((image) => {
           formData.append("propertyImages", image);
@@ -123,11 +144,15 @@ export default function NewPropertyPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const typesRes = await axiosInstance.get("/api/property-types");
+        const [typesRes, facilitiesRes] = await Promise.all([
+          axiosInstance.get("/api/property-types"),
+          axiosInstance.get("/api/facilities"),
+        ]);
         setPropertyTypes(typesRes.data.data || []);
+        setFacilities(facilitiesRes.data.data || []);
       } catch (err: any) {
         console.error("Error fetching data:", err);
-        setError("Failed to load property types");
+        setError("Failed to load property types or facilities");
       }
     };
 
@@ -444,6 +469,75 @@ export default function NewPropertyPage() {
                   </p>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Facilities */}
+          <div className="bg-white rounded-2xl shadow-lg p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+              <FaCheckCircle className="text-[#064749]" />
+              Property Facilities
+            </h2>
+            <p className="text-gray-600 text-sm mb-6">
+              Select at least 3 facilities available at your property
+            </p>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {facilities.map((facility) => {
+                const isChecked = formik.values.facilityIds.includes(
+                  facility.id
+                );
+                return (
+                  <label
+                    key={facility.id}
+                    className={`relative flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition-all hover:shadow-md ${
+                      isChecked
+                        ? "border-[#064749] bg-[#064749]/5 shadow-sm"
+                        : "border-gray-200 hover:border-[#064749]/30"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const newFacilityIds = e.target.checked
+                          ? [...formik.values.facilityIds, facility.id]
+                          : formik.values.facilityIds.filter(
+                              (id) => id !== facility.id
+                            );
+                        formik.setFieldValue("facilityIds", newFacilityIds);
+                      }}
+                      className="w-5 h-5 text-[#064749] border-gray-300 rounded focus:ring-[#064749] focus:ring-2"
+                    />
+                    <span className="flex-1 text-sm font-medium text-gray-700">
+                      {facility.name}
+                    </span>
+                    {isChecked && (
+                      <FaCheckCircle className="text-[#064749] absolute top-2 right-2" />
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+
+            {formik.touched.facilityIds && formik.errors.facilityIds && (
+              <p className="mt-3 text-sm text-red-600">
+                {formik.errors.facilityIds}
+              </p>
+            )}
+
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+              <p className="text-sm text-blue-800">
+                <strong>Selected:</strong> {formik.values.facilityIds.length}{" "}
+                {formik.values.facilityIds.length === 1
+                  ? "facility"
+                  : "facilities"}
+                {formik.values.facilityIds.length < 3 && (
+                  <span className="text-red-600 ml-2">
+                    (Please select at least 3)
+                  </span>
+                )}
+              </p>
             </div>
           </div>
 
