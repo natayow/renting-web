@@ -11,7 +11,6 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Get the first letter of the user's full name or show profile icon
   const renderAvatar = () => {
     if (session?.user?.fullName) {
       return (

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../renting-api"
+		}
+	],
+	"settings": {
+		"prisma.pinToPrisma6": true
+	}
+}
