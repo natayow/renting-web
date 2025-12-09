@@ -20,6 +20,7 @@ import {
   FaMapMarkerAlt,
   FaCheckCircle,
 } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 interface PropertyType {
   id: string;
@@ -63,12 +64,12 @@ export default function NewPropertyPage() {
     validationSchema: createPropertySchema,
     onSubmit: async (values) => {
       if (selectedImages.length === 0) {
-        alert("Please upload at least one image");
+        toast.error("Please upload at least one image");
         return;
       }
 
       if (values.facilityIds.length < 3) {
-        alert("Please select at least 3 facilities");
+        toast.error("Please select at least 3 facilities");
         return;
       }
 
@@ -97,11 +98,20 @@ export default function NewPropertyPage() {
         );
         formData.append("status", values.status);
 
-        // Add facility IDs
+        console.log("Facility IDs to send:", values.facilityIds);
         if (values.facilityIds && values.facilityIds.length > 0) {
-          values.facilityIds.forEach((facilityId) => {
-            formData.append("facilityIds[]", facilityId);
-          });
+          formData.append("facilityIds", JSON.stringify(values.facilityIds));
+          console.log(
+            "Facility IDs sent as JSON:",
+            JSON.stringify(values.facilityIds)
+          );
+        } else {
+          console.log("No facility IDs to send!");
+        }
+
+        console.log("FormData entries:");
+        for (const pair of formData.entries()) {
+          console.log(pair[0], pair[1]);
         }
 
         selectedImages.forEach((image) => {
@@ -116,8 +126,8 @@ export default function NewPropertyPage() {
         });
 
         if (response.data.success) {
-          alert("Property created successfully!");
-          router.push("/admin/properties");
+          toast.success("Property created successfully!");
+          router.push("/");
         }
       } catch (err: any) {
         console.error("Error creating property:", err);
@@ -167,7 +177,7 @@ export default function NewPropertyPage() {
 
     const fileArray = Array.from(files);
     if (fileArray.length + selectedImages.length > 7) {
-      alert("You can only upload up to 7 images");
+      toast.error("You can only upload up to 7 images");
       return;
     }
 
@@ -201,7 +211,6 @@ export default function NewPropertyPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 via-blue-50 to-gray-100 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <button
             onClick={() => router.back()}
@@ -244,7 +253,6 @@ export default function NewPropertyPage() {
         )}
 
         <form onSubmit={formik.handleSubmit} className="space-y-6">
-          {/* Basic Information */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <FaHome className="text-[#064749]" />
@@ -378,7 +386,6 @@ export default function NewPropertyPage() {
             </div>
           </div>
 
-          {/* Property Details */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <FaUsers className="text-[#064749]" />
@@ -472,7 +479,6 @@ export default function NewPropertyPage() {
             </div>
           </div>
 
-          {/* Facilities */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
               <FaCheckCircle className="text-[#064749]" />
@@ -541,7 +547,6 @@ export default function NewPropertyPage() {
             </div>
           </div>
 
-          {/* Booking Details */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <FaCalendarAlt className="text-[#064749]" />
@@ -591,7 +596,6 @@ export default function NewPropertyPage() {
             </div>
           </div>
 
-          {/* Pricing */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <FaDollarSign className="text-[#064749]" />
@@ -640,7 +644,6 @@ export default function NewPropertyPage() {
             </div>
           </div>
 
-          {/* Images */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <FaImage className="text-[#064749]" />
@@ -697,7 +700,6 @@ export default function NewPropertyPage() {
             )}
           </div>
 
-          {/* Submit Button */}
           <div className="flex gap-4">
             <button
               type="button"
