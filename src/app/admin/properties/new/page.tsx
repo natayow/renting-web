@@ -100,10 +100,12 @@ export default function NewPropertyPage() {
         }
       } catch (err: any) {
         console.error("Error creating property:", err);
-        setError(
+        console.error("Error response:", err.response?.data);
+        const errorMessage =
           err.response?.data?.message ||
-            "Failed to create property. Please try again."
-        );
+          err.response?.data?.errors?.map((e: any) => e.msg).join(", ") ||
+          "Failed to create property. Please try again.";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
