@@ -68,6 +68,28 @@ interface PropertyFacility {
   facility: Facility;
 }
 
+interface RoomFacility {
+  id: string;
+  roomId: string;
+  facilityId: string;
+  facility: Facility;
+}
+
+interface Room {
+  id: string;
+  propertyId: string;
+  name: string;
+  description: string | null;
+  maxGuests: number;
+  beds: number;
+  bathrooms: number;
+  basePricePerNightIdr: number;
+  facilities: RoomFacility[];
+  createdAt: string;
+  updatedAt: string | null;
+  deletedAt: string | null;
+}
+
 interface Property {
   id: string;
   title: string;
@@ -82,6 +104,7 @@ interface Property {
   location: Location;
   type: PropertyType | null;
   facilities: PropertyFacility[];
+  rooms?: Room[];
 }
 
 interface ApiResponse {
@@ -156,37 +179,50 @@ export default function PropertyDetailPage() {
     }
   };
 
-  const getFacilityIcon = (iconName: string | null) => {
-    if (!iconName) return <IoHomeOutline className="text-2xl text-gray-600" />;
+  const getFacilityIcon = (
+    iconName: string | null,
+    size: "sm" | "md" = "md"
+  ) => {
+    const sizeClass = size === "sm" ? "text-base" : "text-2xl";
+    if (!iconName)
+      return <IoHomeOutline className={`${sizeClass} text-gray-600`} />;
 
     const key = iconName.toLowerCase();
 
     const iconMap: { [key: string]: React.ReactNode } = {
-      tv: <IoTvOutline className="text-2xl text-gray-600" />,
-      fridge: <BiFridge className="text-2xl text-gray-600" />,
-      fireplace: <IoFlameOutline className="text-2xl text-gray-600" />,
-      phone: <IoCallOutline className="text-2xl text-gray-600" />,
-      "work desk": <IoLaptopOutline className="text-2xl text-gray-600" />,
-      kettle: <IoCafeOutline className="text-2xl text-gray-600" />,
-      "coffee machine": <IoCafeOutline className="text-2xl text-gray-600" />,
-      dishes: <IoRestaurantOutline className="text-2xl text-gray-600" />,
-      "washing machine": (
-        <MdOutlineLocalLaundryService className="text-2xl text-gray-600" />
+      tv: <IoTvOutline className={`${sizeClass} text-gray-600`} />,
+      fridge: <BiFridge className={`${sizeClass} text-gray-600`} />,
+      fireplace: <IoFlameOutline className={`${sizeClass} text-gray-600`} />,
+      phone: <IoCallOutline className={`${sizeClass} text-gray-600`} />,
+      "work desk": <IoLaptopOutline className={`${sizeClass} text-gray-600`} />,
+      kettle: <IoCafeOutline className={`${sizeClass} text-gray-600`} />,
+      "coffee machine": (
+        <IoCafeOutline className={`${sizeClass} text-gray-600`} />
       ),
-      dryer: <IoShirtOutline className="text-2xl text-gray-600" />,
-      iron: <IoShirtOutline className="text-2xl text-gray-600" />,
-      wardrobe: <IoShirtOutline className="text-2xl text-gray-600" />,
-      wifi: <IoWifiOutline className="text-2xl text-gray-600" />,
-      parking: <IoCarOutline className="text-2xl text-gray-600" />,
-      pool: <MdOutlinePool className="text-2xl text-gray-600" />,
-      gym: <MdOutlineFitnessCenter className="text-2xl text-gray-600" />,
-      kitchen: <MdOutlineKitchen className="text-2xl text-gray-600" />,
-      "air conditioning": <IoSnowOutline className="text-2xl text-gray-600" />,
-      heating: <IoFlameOutline className="text-2xl text-gray-600" />,
-      elevator: <MdOutlineElevator className="text-2xl text-gray-600" />,
+      dishes: <IoRestaurantOutline className={`${sizeClass} text-gray-600`} />,
+      "washing machine": (
+        <MdOutlineLocalLaundryService
+          className={`${sizeClass} text-gray-600`}
+        />
+      ),
+      dryer: <IoShirtOutline className={`${sizeClass} text-gray-600`} />,
+      iron: <IoShirtOutline className={`${sizeClass} text-gray-600`} />,
+      wardrobe: <IoShirtOutline className={`${sizeClass} text-gray-600`} />,
+      wifi: <IoWifiOutline className={`${sizeClass} text-gray-600`} />,
+      parking: <IoCarOutline className={`${sizeClass} text-gray-600`} />,
+      pool: <MdOutlinePool className={`${sizeClass} text-gray-600`} />,
+      gym: <MdOutlineFitnessCenter className={`${sizeClass} text-gray-600`} />,
+      kitchen: <MdOutlineKitchen className={`${sizeClass} text-gray-600`} />,
+      "air conditioning": (
+        <IoSnowOutline className={`${sizeClass} text-gray-600`} />
+      ),
+      heating: <IoFlameOutline className={`${sizeClass} text-gray-600`} />,
+      elevator: <MdOutlineElevator className={`${sizeClass} text-gray-600`} />,
     };
 
-    return iconMap[key] || <IoHomeOutline className="text-2xl text-gray-600" />;
+    return (
+      iconMap[key] || <IoHomeOutline className={`${sizeClass} text-gray-600`} />
+    );
   };
 
   if (loading) {
@@ -323,7 +359,7 @@ export default function PropertyDetailPage() {
 
             <div>
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-                Amenities
+                Facilities
               </h2>
               {property.facilities && property.facilities.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -343,6 +379,95 @@ export default function PropertyDetailPage() {
                 <p className="text-gray-500">No amenities listed.</p>
               )}
             </div>
+
+            {property.rooms && property.rooms.length > 0 && (
+              <>
+                <hr className="border-gray-300" />
+
+                <div>
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                    Available Rooms
+                  </h2>
+                  <div className="space-y-4">
+                    {property.rooms.map((room) => (
+                      <div
+                        key={room.id}
+                        className="bg-white rounded-lg border border-gray-200 p-6 hover:border-[#064749] transition"
+                      >
+                        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                              {room.name}
+                            </h3>
+                            {room.description && (
+                              <p className="text-gray-600 mb-3">
+                                {room.description}
+                              </p>
+                            )}
+
+                            <div className="flex flex-wrap gap-4 text-gray-700 mb-3">
+                              <div className="flex items-center gap-2">
+                                <IoBedOutline className="text-lg" />
+                                <span className="text-sm">
+                                  {room.beds} bed{room.beds !== 1 ? "s" : ""}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <IoWaterOutline className="text-lg" />
+                                <span className="text-sm">
+                                  {room.bathrooms} bathroom
+                                  {room.bathrooms !== 1 ? "s" : ""}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <IoPersonOutline className="text-lg" />
+                                <span className="text-sm">
+                                  Max {room.maxGuests} guest
+                                  {room.maxGuests !== 1 ? "s" : ""}
+                                </span>
+                              </div>
+                            </div>
+
+                            {room.facilities && room.facilities.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-sm font-medium text-gray-700 mb-2">
+                                  Room Facilities:
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {room.facilities.map((rf) => (
+                                    <div
+                                      key={rf.id}
+                                      className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full text-sm"
+                                    >
+                                      <div className="shrink-0">
+                                        {getFacilityIcon(
+                                          rf.facility.icon,
+                                          "sm"
+                                        )}
+                                      </div>
+                                      <span className="text-gray-700">
+                                        {rf.facility.name}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="md:text-right">
+                            <div className="text-2xl font-bold text-[#064749] mb-1">
+                              {formatPrice(room.basePricePerNightIdr)}
+                            </div>
+                            <div className="text-sm text-gray-600">/ night</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="lg:col-span-1">

@@ -94,12 +94,15 @@ export default function PropertyList() {
     return (
       <section className="bg-white">
         <div className="container mx-auto px-4 py-12">
-          <div className="flex items-center mb-4">
+          <Link
+            href="/properties"
+            className="flex items-center mb-4 w-fit hover:opacity-80 transition-opacity"
+          >
             <h2 className="text-lg text-[#181A18] font-semibold">
               Available Properties
             </h2>
             <IoIosArrowForward className="text-xl text-[#181A18]" />
-          </div>
+          </Link>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
             {[...Array(6)].map((_, index) => (
               <div key={index} className="animate-pulse">
@@ -120,12 +123,15 @@ export default function PropertyList() {
     return (
       <section className="bg-white">
         <div className="container mx-auto px-4 py-12">
-          <div className="flex items-center mb-4">
+          <Link
+            href="/properties"
+            className="flex items-center mb-4 w-fit hover:opacity-80 transition-opacity"
+          >
             <h2 className="text-lg text-[#181A18] font-semibold">
               Available Properties
             </h2>
             <IoIosArrowForward className="text-xl text-[#181A18]" />
-          </div>
+          </Link>
           <div className="text-center py-12">
             <p className="text-red-600 mb-4">{error}</p>
             <button
@@ -144,12 +150,15 @@ export default function PropertyList() {
     return (
       <section className="bg-white">
         <div className="container mx-auto px-4 py-12">
-          <div className="flex items-center mb-4">
+          <Link
+            href="/properties"
+            className="flex items-center mb-4 w-fit hover:opacity-80 transition-opacity"
+          >
             <h2 className="text-lg text-[#181A18] font-semibold">
               Available Properties
             </h2>
             <IoIosArrowForward className="text-xl text-[#181A18]" />
-          </div>
+          </Link>
           <div className="text-center py-12">
             <p className="text-gray-600">
               No properties available at the moment.
@@ -163,12 +172,15 @@ export default function PropertyList() {
   return (
     <section className="bg-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="flex items-center mb-4">
+        <Link
+          href="/properties"
+          className="flex items-center mb-4 w-fit hover:opacity-80 transition-opacity"
+        >
           <h2 className="text-lg text-[#181A18] font-semibold">
             Available Properties
           </h2>
           <IoIosArrowForward className="text-xl text-[#181A18]" />
-        </div>
+        </Link>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
           {properties.map((property) => (
