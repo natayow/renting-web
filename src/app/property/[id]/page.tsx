@@ -124,6 +124,7 @@ export default function PropertyDetailPage() {
   const [guests, setGuests] = useState(1);
   const [moveInDate, setMoveInDate] = useState<Date | null>(null);
   const [moveOutDate, setMoveOutDate] = useState<Date | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 
   useEffect(() => {
     if (params.id) {
@@ -322,26 +323,6 @@ export default function PropertyDetailPage() {
                 <IoLocationOutline className="text-lg mt-0.5 shrink-0" />
                 <span className="text-sm">{property.location.address}</span>
               </div>
-
-              <div className="flex flex-wrap gap-6 text-gray-700">
-                <div className="flex items-center gap-2">
-                  <IoBedOutline className="text-xl" />
-                  <span>
-                    {property.beds} bed{property.beds !== 1 ? "s" : ""}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <IoWaterOutline className="text-xl" />
-                  <span>
-                    {property.bathrooms} bathroom
-                    {property.bathrooms !== 1 ? "s" : ""}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <IoPersonOutline className="text-xl" />
-                  <span>Max {property.maxGuests} guests</span>
-                </div>
-              </div>
             </div>
 
             <hr className="border-gray-300" />
@@ -392,7 +373,12 @@ export default function PropertyDetailPage() {
                     {property.rooms.map((room) => (
                       <div
                         key={room.id}
-                        className="bg-white rounded-lg border border-gray-200 p-6 hover:border-[#064749] transition"
+                        onClick={() => setSelectedRoom(room)}
+                        className={`bg-white rounded-lg border p-6 hover:border-[#064749] transition cursor-pointer ${
+                          selectedRoom?.id === room.id
+                            ? "border-[#064749] border-2 bg-[#064749]/5"
+                            : "border-gray-200"
+                        }`}
                       >
                         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                           <div className="flex-1">
@@ -474,10 +460,21 @@ export default function PropertyDetailPage() {
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
               <div className="mb-6 flex items-baseline gap-1">
                 <div className="text-3xl font-bold text-gray-900">
-                  {formatPrice(property.basePricePerNightIdr)}
+                  {formatPrice(
+                    selectedRoom
+                      ? selectedRoom.basePricePerNightIdr
+                      : property.basePricePerNightIdr
+                  )}
                 </div>
                 <div className="text-gray-600">/ night</div>
               </div>
+              {selectedRoom && (
+                <div className="mb-4 p-3 bg-[#064749]/10 rounded-lg border border-[#064749]/30">
+                  <p className="text-sm font-medium text-[#064749]">
+                    Selected: {selectedRoom.name}
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-4 mb-6">
                 <div>
