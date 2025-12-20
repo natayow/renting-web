@@ -94,11 +94,6 @@ interface Property {
   id: string;
   title: string;
   description: string | null;
-  basePricePerNightIdr: number;
-  maxGuests: number;
-  bedrooms: number;
-  beds: number;
-  bathrooms: number;
   status: string;
   images: PropertyImage[];
   location: Location;
@@ -142,7 +137,14 @@ export default function PropertyDetailPage() {
       );
 
       if (response.data.success) {
-        setProperty(response.data.data);
+        const propertyData = response.data.data;
+        setProperty(propertyData);
+
+        // Auto-select the first room if rooms are available
+        if (propertyData.rooms && propertyData.rooms.length > 0) {
+          setSelectedRoom(propertyData.rooms[0]);
+          setGuests(1); // Set default guests to 1
+        }
       } else {
         setError(response.data.message || "Failed to fetch property");
       }
@@ -163,17 +165,51 @@ export default function PropertyDetailPage() {
     }).format(price);
   };
 
+  const getPriceRangeDisplay = () => {
+    if (!property || !property.rooms || property.rooms.length === 0) {
+      return null;
+    }
+
+    const prices = property.rooms.map((room) => room.basePricePerNightIdr);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+
+    // If all rooms have the same price
+    if (minPrice === maxPrice) {
+      return (
+        <div className="flex items-baseline gap-2">
+          <span className="text-2xl font-bold text-[#064749]">
+            {formatPrice(minPrice)}
+          </span>
+          <span className="text-gray-600">/ night</span>
+        </div>
+      );
+    }
+
+    // Show price range
+    return (
+      <div className="flex items-baseline gap-2">
+        <span className="text-2xl font-bold text-[#064749]">
+          {formatPrice(minPrice)} - {formatPrice(maxPrice)}
+        </span>
+        <span className="text-gray-600">/ night</span>
+      </div>
+    );
+  };
+
   const handleContinueBooking = () => {
     if (status === "unauthenticated") {
       router.push("/login");
       return;
     }
-
-    console.log("Booking:", { moveInDate, moveOutDate, guests });
   };
 
   const handleGuestChange = (increment: boolean) => {
-    if (increment && property && guests < property.maxGuests) {
+    if (!selectedRoom) return;
+
+    const maxGuests = selectedRoom.maxGuests;
+
+    if (increment && guests < maxGuests) {
       setGuests(guests + 1);
     } else if (!increment && guests > 1) {
       setGuests(guests - 1);
@@ -458,20 +494,24 @@ export default function PropertyDetailPage() {
 
           <div className="lg:col-span-1">
             <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-              <div className="mb-6 flex items-baseline gap-1">
-                <div className="text-3xl font-bold text-gray-900">
-                  {formatPrice(
-                    selectedRoom
-                      ? selectedRoom.basePricePerNightIdr
-                      : property.basePricePerNightIdr
-                  )}
-                </div>
-                <div className="text-gray-600">/ night</div>
-              </div>
-              {selectedRoom && (
-                <div className="mb-4 p-3 bg-[#064749]/10 rounded-lg border border-[#064749]/30">
-                  <p className="text-sm font-medium text-[#064749]">
-                    Selected: {selectedRoom.name}
+              {selectedRoom ? (
+                <>
+                  <div className="mb-6 flex items-baseline gap-1">
+                    <div className="text-3xl font-bold text-gray-900">
+                      {formatPrice(selectedRoom.basePricePerNightIdr)}
+                    </div>
+                    <div className="text-gray-600">/ night</div>
+                  </div>
+                  <div className="mb-4 p-3 bg-[#064749]/10 rounded-lg border border-[#064749]/30">
+                    <p className="text-sm font-medium text-[#064749]">
+                      Selected: {selectedRoom.name}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-300">
+                  <p className="text-sm text-gray-600 text-center">
+                    Please select a room to see pricing
                   </p>
                 </div>
               )}
@@ -521,8 +561,8 @@ export default function PropertyDetailPage() {
                   <div className="flex items-center justify-between px-4 py-2 border border-gray-300 rounded-lg">
                     <button
                       onClick={() => handleGuestChange(false)}
-                      disabled={guests <= 1}
-                      className="text-2xl  font-semibold text-gray-600 hover:text-gray-900"
+                      disabled={guests <= 1 || !selectedRoom}
+                      className="text-2xl  font-semibold text-gray-600 hover:text-gray-900 disabled:opacity-30"
                     >
                       −
                     </button>
@@ -531,8 +571,11 @@ export default function PropertyDetailPage() {
                     </span>
                     <button
                       onClick={() => handleGuestChange(true)}
-                      disabled={guests >= property.maxGuests}
-                      className="text-2xl font-semibold text-gray-600 hover:text-gray-900 "
+                      disabled={
+                        !selectedRoom ||
+                        (selectedRoom && guests >= selectedRoom.maxGuests)
+                      }
+                      className="text-2xl font-semibold text-gray-600 hover:text-gray-900 disabled:opacity-30"
                     >
                       +
                     </button>

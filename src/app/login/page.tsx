@@ -22,7 +22,6 @@ export default function Login() {
         password: values?.password,
         redirect: false,
       });
-      console.log(response);
       if (response?.ok) {
         toast.success("Login successful!");
         router.push("/");

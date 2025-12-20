@@ -7,6 +7,7 @@ import { useFormik } from "formik";
 import {
   createPropertySchema,
   CreatePropertyFormData,
+  RoomData,
 } from "./schemas/propertySchema";
 import axiosInstance from "@/utils/axiosInstance";
 import {
@@ -19,6 +20,8 @@ import {
   FaImage,
   FaMapMarkerAlt,
   FaCheckCircle,
+  FaPlus,
+  FaTrash,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 
@@ -51,15 +54,20 @@ export default function NewPropertyPage() {
       city: "",
       country: "",
       address: "",
-      maxGuests: 1,
-      bedrooms: 1,
-      beds: 1,
-      bathrooms: 1,
       minNights: 1,
       maxNights: 30,
-      basePricePerNightIdr: 0,
       status: "DRAFT",
       facilityIds: [],
+      rooms: [
+        {
+          name: "",
+          description: "",
+          maxGuests: 1,
+          beds: 1,
+          bathrooms: 1,
+          basePricePerNightIdr: 0,
+        },
+      ],
     },
     validationSchema: createPropertySchema,
     onSubmit: async (values) => {
@@ -86,32 +94,14 @@ export default function NewPropertyPage() {
         formData.append("city", values.city);
         formData.append("country", values.country);
         formData.append("address", values.address);
-        formData.append("maxGuests", values.maxGuests.toString());
-        formData.append("bedrooms", values.bedrooms.toString());
-        formData.append("beds", values.beds.toString());
-        formData.append("bathrooms", values.bathrooms.toString());
         formData.append("minNights", values.minNights.toString());
         formData.append("maxNights", values.maxNights.toString());
-        formData.append(
-          "basePricePerNightIdr",
-          values.basePricePerNightIdr.toString()
-        );
         formData.append("status", values.status);
 
-        console.log("Facility IDs to send:", values.facilityIds);
+        formData.append("rooms", JSON.stringify(values.rooms));
+
         if (values.facilityIds && values.facilityIds.length > 0) {
           formData.append("facilityIds", JSON.stringify(values.facilityIds));
-          console.log(
-            "Facility IDs sent as JSON:",
-            JSON.stringify(values.facilityIds)
-          );
-        } else {
-          console.log("No facility IDs to send!");
-        }
-
-        console.log("FormData entries:");
-        for (const pair of formData.entries()) {
-          console.log(pair[0], pair[1]);
         }
 
         selectedImages.forEach((image) => {
@@ -195,6 +185,33 @@ export default function NewPropertyPage() {
 
     setSelectedImages(newImages);
     setImagePreviews(newPreviews);
+  };
+
+  const addRoom = () => {
+    const newRoom: RoomData = {
+      name: "",
+      description: "",
+      maxGuests: 1,
+      beds: 1,
+      bathrooms: 1,
+      basePricePerNightIdr: 0,
+    };
+    formik.setFieldValue("rooms", [...formik.values.rooms, newRoom]);
+  };
+
+  const removeRoom = (index: number) => {
+    if (formik.values.rooms.length <= 1) {
+      toast.error("At least one room is required");
+      return;
+    }
+    const newRooms = formik.values.rooms.filter((_, i) => i !== index);
+    formik.setFieldValue("rooms", newRooms);
+  };
+
+  const updateRoom = (index: number, field: keyof RoomData, value: any) => {
+    const updatedRooms = [...formik.values.rooms];
+    updatedRooms[index] = { ...updatedRooms[index], [field]: value };
+    formik.setFieldValue("rooms", updatedRooms);
   };
 
   if (status === "loading") {
@@ -387,95 +404,275 @@ export default function NewPropertyPage() {
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <FaUsers className="text-[#064749]" />
-              Property Details
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                <FaBed className="text-[#064749]" />
+                Rooms ({formik.values.rooms.length})
+              </h2>
+              <button
+                type="button"
+                onClick={addRoom}
+                className="flex items-center gap-2 px-4 py-2 bg-[#064749] text-white rounded-xl hover:bg-[#087174] transition-all font-semibold"
+              >
+                <FaPlus />
+                Add Room
+              </button>
+            </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <FaUsers className="inline mr-2" />
-                  Max Guests *
-                </label>
-                <input
-                  type="number"
-                  name="maxGuests"
-                  value={formik.values.maxGuests}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="1"
-                />
-                {formik.touched.maxGuests && formik.errors.maxGuests && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formik.errors.maxGuests}
-                  </p>
-                )}
-              </div>
+            <div className="space-y-6">
+              {formik.values.rooms.map((room, index) => (
+                <div
+                  key={index}
+                  className="border-2 border-gray-200 rounded-xl p-6 relative"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-gray-800">
+                      Room {index + 1}
+                    </h3>
+                    {formik.values.rooms.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeRoom(index)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all text-sm"
+                      >
+                        <FaTrash className="text-xs" />
+                        Remove
+                      </button>
+                    )}
+                  </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <FaBed className="inline mr-2" />
-                  Bedrooms *
-                </label>
-                <input
-                  type="number"
-                  name="bedrooms"
-                  value={formik.values.bedrooms}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="0"
-                />
-                {formik.touched.bedrooms && formik.errors.bedrooms && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formik.errors.bedrooms}
-                  </p>
-                )}
-              </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Room Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={room.name}
+                        onChange={(e) =>
+                          updateRoom(index, "name", e.target.value)
+                        }
+                        className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
+                        placeholder="e.g., Deluxe Ocean View Suite"
+                      />
+                      {formik.touched.rooms?.[index]?.name &&
+                        formik.errors.rooms?.[index] &&
+                        typeof formik.errors.rooms[index] === "object" &&
+                        "name" in formik.errors.rooms[index] && (
+                          <p className="mt-1 text-sm text-red-600">
+                            {
+                              (
+                                formik.errors.rooms[index] as {
+                                  name?: string;
+                                }
+                              ).name
+                            }
+                          </p>
+                        )}
+                    </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <FaBed className="inline mr-2" />
-                  Beds *
-                </label>
-                <input
-                  type="number"
-                  name="beds"
-                  value={formik.values.beds}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="0"
-                />
-                {formik.touched.beds && formik.errors.beds && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formik.errors.beds}
-                  </p>
-                )}
-              </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Room Description
+                      </label>
+                      <textarea
+                        value={room.description || ""}
+                        onChange={(e) =>
+                          updateRoom(index, "description", e.target.value)
+                        }
+                        rows={3}
+                        className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
+                        placeholder="Describe this room..."
+                      />
+                    </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <FaBath className="inline mr-2" />
-                  Bathrooms *
-                </label>
-                <input
-                  type="number"
-                  name="bathrooms"
-                  value={formik.values.bathrooms}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="0"
-                />
-                {formik.touched.bathrooms && formik.errors.bathrooms && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formik.errors.bathrooms}
-                  </p>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <FaUsers className="inline mr-2" />
+                          Max Guests *
+                        </label>
+                        <input
+                          type="number"
+                          value={room.maxGuests}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            updateRoom(
+                              index,
+                              "maxGuests",
+                              value === "" ? "" : parseInt(value) || 1
+                            );
+                          }}
+                          onBlur={(e) => {
+                            if (
+                              e.target.value === "" ||
+                              parseInt(e.target.value) < 1
+                            ) {
+                              updateRoom(index, "maxGuests", 1);
+                            }
+                          }}
+                          className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min="1"
+                          placeholder="Enter number of guests"
+                        />
+                        {formik.touched.rooms?.[index]?.maxGuests &&
+                          formik.errors.rooms?.[index] &&
+                          typeof formik.errors.rooms[index] === "object" &&
+                          "maxGuests" in formik.errors.rooms[index] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {
+                                (
+                                  formik.errors.rooms[index] as {
+                                    maxGuests?: string;
+                                  }
+                                ).maxGuests
+                              }
+                            </p>
+                          )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <FaBed className="inline mr-2" />
+                          Beds *
+                        </label>
+                        <input
+                          type="number"
+                          value={room.beds}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            updateRoom(
+                              index,
+                              "beds",
+                              value === "" ? "" : parseInt(value) || 1
+                            );
+                          }}
+                          onBlur={(e) => {
+                            if (
+                              e.target.value === "" ||
+                              parseInt(e.target.value) < 1
+                            ) {
+                              updateRoom(index, "beds", 1);
+                            }
+                          }}
+                          className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min="1"
+                          placeholder="Enter number of beds"
+                        />
+                        {formik.touched.rooms?.[index]?.beds &&
+                          formik.errors.rooms?.[index] &&
+                          typeof formik.errors.rooms[index] === "object" &&
+                          "beds" in formik.errors.rooms[index] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {
+                                (
+                                  formik.errors.rooms[index] as {
+                                    beds?: string;
+                                  }
+                                ).beds
+                              }
+                            </p>
+                          )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <FaBath className="inline mr-2" />
+                          Bathrooms *
+                        </label>
+                        <input
+                          type="number"
+                          value={room.bathrooms}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            updateRoom(
+                              index,
+                              "bathrooms",
+                              value === "" ? "" : parseInt(value) || 1
+                            );
+                          }}
+                          onBlur={(e) => {
+                            if (
+                              e.target.value === "" ||
+                              parseInt(e.target.value) < 1
+                            ) {
+                              updateRoom(index, "bathrooms", 1);
+                            }
+                          }}
+                          className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min="1"
+                          placeholder="Enter number of bathrooms"
+                        />
+                        {formik.touched.rooms?.[index]?.bathrooms &&
+                          formik.errors.rooms?.[index] &&
+                          typeof formik.errors.rooms[index] === "object" &&
+                          "bathrooms" in formik.errors.rooms[index] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {
+                                (
+                                  formik.errors.rooms[index] as {
+                                    bathrooms?: string;
+                                  }
+                                ).bathrooms
+                              }
+                            </p>
+                          )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <FaDollarSign className="inline mr-2" />
+                          Base Price per Night (IDR) *
+                        </label>
+                        <input
+                          type="number"
+                          value={room.basePricePerNightIdr}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            updateRoom(
+                              index,
+                              "basePricePerNightIdr",
+                              value === "" ? "" : parseInt(value) || 0
+                            );
+                          }}
+                          onBlur={(e) => {
+                            if (
+                              e.target.value === "" ||
+                              parseInt(e.target.value) < 0
+                            ) {
+                              updateRoom(index, "basePricePerNightIdr", 0);
+                            }
+                          }}
+                          className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min="0"
+                          placeholder="e.g., 500000"
+                        />
+                        {formik.touched.rooms?.[index]?.basePricePerNightIdr &&
+                          formik.errors.rooms?.[index] &&
+                          typeof formik.errors.rooms[index] === "object" &&
+                          "basePricePerNightIdr" in
+                            formik.errors.rooms[index] && (
+                            <p className="mt-1 text-sm text-red-600">
+                              {
+                                (
+                                  formik.errors.rooms[index] as {
+                                    basePricePerNightIdr?: string;
+                                  }
+                                ).basePricePerNightIdr
+                              }
+                            </p>
+                          )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {formik.touched.rooms &&
+                formik.errors.rooms &&
+                typeof formik.errors.rooms === "string" && (
+                  <p className="text-sm text-red-600">{formik.errors.rooms}</p>
                 )}
-              </div>
             </div>
           </div>
 
@@ -599,48 +796,24 @@ export default function NewPropertyPage() {
           <div className="bg-white rounded-2xl shadow-lg p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
               <FaDollarSign className="text-[#064749]" />
-              Pricing
+              Property Status
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Base Price per Night (IDR) *
-                </label>
-                <input
-                  type="number"
-                  name="basePricePerNightIdr"
-                  value={formik.values.basePricePerNightIdr}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="0"
-                  placeholder="e.g., 500000"
-                />
-                {formik.touched.basePricePerNightIdr &&
-                  formik.errors.basePricePerNightIdr && (
-                    <p className="mt-1 text-sm text-red-600">
-                      {formik.errors.basePricePerNightIdr}
-                    </p>
-                  )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Status *
-                </label>
-                <select
-                  name="status"
-                  value={formik.values.status}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                >
-                  <option value="DRAFT">Draft</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Status *
+              </label>
+              <select
+                name="status"
+                value={formik.values.status}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
+              >
+                <option value="DRAFT">Draft</option>
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+              </select>
             </div>
           </div>
 

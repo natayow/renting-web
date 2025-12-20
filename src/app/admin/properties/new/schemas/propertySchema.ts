@@ -1,5 +1,38 @@
 import * as Yup from "yup";
 
+export interface RoomData {
+  name: string;
+  description?: string;
+  maxGuests: number;
+  beds: number;
+  bathrooms: number;
+  basePricePerNightIdr: number;
+}
+
+const roomSchema = Yup.object({
+  name: Yup.string()
+    .min(3, "Room name must be at least 3 characters")
+    .max(120, "Room name must not exceed 120 characters")
+    .required("Room name is required"),
+  description: Yup.string().optional(),
+  maxGuests: Yup.number()
+    .min(1, "At least 1 guest required")
+    .integer("Must be a whole number")
+    .required("Max guests is required"),
+  beds: Yup.number()
+    .min(1, "At least 1 bed required")
+    .integer("Must be a whole number")
+    .required("Beds is required"),
+  bathrooms: Yup.number()
+    .min(1, "At least 1 bathroom required")
+    .integer("Must be a whole number")
+    .required("Bathrooms is required"),
+  basePricePerNightIdr: Yup.number()
+    .min(0, "Price cannot be negative")
+    .integer("Must be a whole number")
+    .required("Price is required"),
+});
+
 export const createPropertySchema = Yup.object({
   title: Yup.string()
     .min(3, "Title must be at least 3 characters")
@@ -19,22 +52,6 @@ export const createPropertySchema = Yup.object({
     .min(3, "Address must be at least 3 characters")
     .max(255, "Address must not exceed 255 characters")
     .required("Address is required"),
-  maxGuests: Yup.number()
-    .min(1, "At least 1 guest required")
-    .integer("Must be a whole number")
-    .required("Max guests is required"),
-  bedrooms: Yup.number()
-    .min(0, "Cannot be negative")
-    .integer("Must be a whole number")
-    .required("Bedrooms is required"),
-  beds: Yup.number()
-    .min(0, "Cannot be negative")
-    .integer("Must be a whole number")
-    .required("Beds is required"),
-  bathrooms: Yup.number()
-    .min(0, "Cannot be negative")
-    .integer("Must be a whole number")
-    .required("Bathrooms is required"),
   minNights: Yup.number()
     .min(1, "Minimum nights must be at least 1")
     .integer("Must be a whole number")
@@ -42,11 +59,18 @@ export const createPropertySchema = Yup.object({
   maxNights: Yup.number()
     .min(1, "Maximum nights must be at least 1")
     .integer("Must be a whole number")
-    .required("Maximum nights is required"),
-  basePricePerNightIdr: Yup.number()
-    .min(0, "Price cannot be negative")
-    .integer("Must be a whole number")
-    .required("Price is required"),
+    .required("Maximum nights is required")
+    .test(
+      "max-greater-than-min",
+      "Maximum nights must be greater than or equal to minimum nights",
+      function (value) {
+        const { minNights } = this.parent;
+        if (minNights && value) {
+          return value >= minNights;
+        }
+        return true;
+      }
+    ),
   status: Yup.string()
     .oneOf(["DRAFT", "ACTIVE", "INACTIVE"], "Invalid status")
     .required("Status is required"),
@@ -54,6 +78,10 @@ export const createPropertySchema = Yup.object({
     .of(Yup.string())
     .min(3, "Please select at least 3 facilities")
     .required("Facilities are required"),
+  rooms: Yup.array()
+    .of(roomSchema)
+    .min(1, "At least one room is required")
+    .required("Rooms are required")
 });
 
 export interface CreatePropertyFormData {
@@ -63,13 +91,9 @@ export interface CreatePropertyFormData {
   city: string;
   country: string;
   address: string;
-  maxGuests: number;
-  bedrooms: number;
-  beds: number;
-  bathrooms: number;
   minNights: number;
   maxNights: number;
-  basePricePerNightIdr: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
   facilityIds: string[];
+  rooms: RoomData[];
 }

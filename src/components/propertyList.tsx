@@ -40,6 +40,11 @@ interface Property {
   images: PropertyImage[];
   location: Location;
   type: PropertyType | null;
+  minPricePerNight?: number; // Minimum room price calculated by backend
+  rooms?: Array<{
+    id: string;
+    basePricePerNightIdr: number;
+  }>;
 }
 
 interface ApiResponse {
@@ -88,6 +93,23 @@ export default function PropertyList() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
+  };
+
+  const getPriceDisplay = (property: Property) => {
+    if (property.rooms && property.rooms.length > 0) {
+      const prices = property.rooms.map((room) => room.basePricePerNightIdr);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
+      if (minPrice === maxPrice) {
+        return `${formatPrice(minPrice)} / night`;
+      }
+
+      return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)} / night`;
+    }
+
+    const price = property.minPricePerNight || property.basePricePerNightIdr;
+    return `${formatPrice(price)} / night`;
   };
 
   if (loading) {
@@ -213,7 +235,7 @@ export default function PropertyList() {
                   {property.location.city || property.location.name}
                 </p>
                 <p className="text-gray-600 font-extralight text-sm">
-                  {formatPrice(property.basePricePerNightIdr)} / night
+                  {getPriceDisplay(property)}
                 </p>
               </div>
             </Link>
