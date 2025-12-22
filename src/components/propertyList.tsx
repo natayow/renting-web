@@ -31,11 +31,6 @@ interface Property {
   id: string;
   title: string;
   description: string | null;
-  basePricePerNightIdr: number;
-  maxGuests: number;
-  bedrooms: number;
-  beds: number;
-  bathrooms: number;
   status: string;
   images: PropertyImage[];
   location: Location;
@@ -108,8 +103,8 @@ export default function PropertyList() {
       return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)} / night`;
     }
 
-    const price = property.minPricePerNight || property.basePricePerNightIdr;
-    return `${formatPrice(price)} / night`;
+    const price = property.minPricePerNight || 0;
+    return price > 0 ? `${formatPrice(price)} / night` : "Price not available";
   };
 
   if (loading) {

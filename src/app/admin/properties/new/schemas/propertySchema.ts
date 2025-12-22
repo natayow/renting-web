@@ -52,25 +52,6 @@ export const createPropertySchema = Yup.object({
     .min(3, "Address must be at least 3 characters")
     .max(255, "Address must not exceed 255 characters")
     .required("Address is required"),
-  minNights: Yup.number()
-    .min(1, "Minimum nights must be at least 1")
-    .integer("Must be a whole number")
-    .required("Minimum nights is required"),
-  maxNights: Yup.number()
-    .min(1, "Maximum nights must be at least 1")
-    .integer("Must be a whole number")
-    .required("Maximum nights is required")
-    .test(
-      "max-greater-than-min",
-      "Maximum nights must be greater than or equal to minimum nights",
-      function (value) {
-        const { minNights } = this.parent;
-        if (minNights && value) {
-          return value >= minNights;
-        }
-        return true;
-      }
-    ),
   status: Yup.string()
     .oneOf(["DRAFT", "ACTIVE", "INACTIVE"], "Invalid status")
     .required("Status is required"),
@@ -91,8 +72,6 @@ export interface CreatePropertyFormData {
   city: string;
   country: string;
   address: string;
-  minNights: number;
-  maxNights: number;
   status: "DRAFT" | "ACTIVE" | "INACTIVE";
   facilityIds: string[];
   rooms: RoomData[];

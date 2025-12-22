@@ -54,8 +54,6 @@ export default function NewPropertyPage() {
       city: "",
       country: "",
       address: "",
-      minNights: 1,
-      maxNights: 30,
       status: "DRAFT",
       facilityIds: [],
       rooms: [
@@ -94,8 +92,6 @@ export default function NewPropertyPage() {
         formData.append("city", values.city);
         formData.append("country", values.country);
         formData.append("address", values.address);
-        formData.append("minNights", values.minNights.toString());
-        formData.append("maxNights", values.maxNights.toString());
         formData.append("status", values.status);
 
         formData.append("rooms", JSON.stringify(values.rooms));
@@ -741,55 +737,6 @@ export default function NewPropertyPage() {
                   </span>
                 )}
               </p>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <FaCalendarAlt className="text-[#064749]" />
-              Booking Details
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Minimum Nights *
-                </label>
-                <input
-                  type="number"
-                  name="minNights"
-                  value={formik.values.minNights}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="1"
-                />
-                {formik.touched.minNights && formik.errors.minNights && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formik.errors.minNights}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Maximum Nights *
-                </label>
-                <input
-                  type="number"
-                  name="maxNights"
-                  value={formik.values.maxNights}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className="w-full text-gray-600 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
-                  min="1"
-                />
-                {formik.touched.maxNights && formik.errors.maxNights && (
-                  <p className="mt-1 text-sm text-red-600">
-                    {formik.errors.maxNights}
-                  </p>
-                )}
-              </div>
             </div>
           </div>
 
