@@ -23,6 +23,15 @@ interface UserProfile {
   gender?: string;
   role: string;
   createdAt: string;
+  adminProfile?: {
+    id: string;
+    displayName: string;
+    description?: string;
+    bankName?: string;
+    bankAccountNo?: string;
+    bankAccountName?: string;
+    createdAt: string;
+  };
 }
 
 interface Booking {
@@ -203,7 +212,10 @@ export default function ProfilePage() {
               </div>
               <div className="flex gap-3">
                 {profile?.role?.toUpperCase() === "USER" && (
-                  <button className="px-6 py-3 bg-linear-to-r from-[#064749] to-[#0a9399] text-white rounded-full hover:from-[#053638] hover:to-[#087174] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                  <button
+                    onClick={() => router.push("/become-tenant")}
+                    className="px-6 py-3 bg-linear-to-r from-[#064749] to-[#0a9399] text-white rounded-full hover:from-[#053638] hover:to-[#087174] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium"
+                  >
                     <svg
                       className="w-5 h-5"
                       fill="none"
@@ -330,33 +342,175 @@ export default function ProfilePage() {
         </div>
 
         {profile?.role?.toUpperCase() === "ADMIN" ? (
-          <div className="bg-white rounded-2xl shadow-lg p-8 mt-6 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                  />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Manage Property
-              </h2>
-            </div>
+          <>
+            {/* Admin Profile Information */}
+            {profile.adminProfile && (
+              <div className="bg-white rounded-2xl shadow-lg p-6 mt-6 hover:shadow-xl transition-shadow">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-linear-to-br from-[#064749] to-[#0a9399] rounded-xl flex items-center justify-center">
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Admin Profile
+                  </h2>
+                </div>
 
-            <div className="bg-linear-to-br from-purple-50 via-purple-100 to-indigo-50 rounded-2xl p-8 border-2 border-purple-200">
-              <div className="text-center mb-6">
-                <div className="w-20 h-20 bg-linear-to-br from-purple-500 to-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="group">
+                      <label className="text-sm font-medium text-gray-500 mb-1 block">
+                        Display Name
+                      </label>
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl group-hover:bg-gray-100 transition-colors">
+                        <svg
+                          className="w-5 h-5 text-[#064749]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                          />
+                        </svg>
+                        <p className="text-gray-900 font-medium">
+                          {profile.adminProfile.displayName}
+                        </p>
+                      </div>
+                    </div>
+
+                    {profile.adminProfile.description && (
+                      <div className="group">
+                        <label className="text-sm font-medium text-gray-500 mb-1 block">
+                          Description
+                        </label>
+                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl group-hover:bg-gray-100 transition-colors">
+                          <svg
+                            className="w-5 h-5 text-[#064749] mt-0.5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                            />
+                          </svg>
+                          <p className="text-gray-900 font-medium">
+                            {profile.adminProfile.description}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-4">
+                    {profile.adminProfile.bankName && (
+                      <>
+                        <div className="group">
+                          <label className="text-sm font-medium text-gray-500 mb-1 block">
+                            Bank Name
+                          </label>
+                          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl group-hover:bg-gray-100 transition-colors">
+                            <svg
+                              className="w-5 h-5 text-[#064749]"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <p className="text-gray-900 font-medium">
+                              {profile.adminProfile.bankName}
+                            </p>
+                          </div>
+                        </div>
+
+                        {profile.adminProfile.bankAccountNo && (
+                          <div className="group">
+                            <label className="text-sm font-medium text-gray-500 mb-1 block">
+                              Bank Account Number
+                            </label>
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl group-hover:bg-gray-100 transition-colors">
+                              <svg
+                                className="w-5 h-5 text-[#064749]"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"
+                                />
+                              </svg>
+                              <p className="text-gray-900 font-medium">
+                                {profile.adminProfile.bankAccountNo}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {profile.adminProfile.bankAccountName && (
+                          <div className="group">
+                            <label className="text-sm font-medium text-gray-500 mb-1 block">
+                              Bank Account Name
+                            </label>
+                            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl group-hover:bg-gray-100 transition-colors">
+                              <svg
+                                className="w-5 h-5 text-[#064749]"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                />
+                              </svg>
+                              <p className="text-gray-900 font-medium">
+                                {profile.adminProfile.bankAccountName}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Property Management Section */}
+            <div className="bg-white rounded-2xl shadow-lg p-8 mt-6 hover:shadow-xl transition-shadow">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
                   <svg
-                    className="w-10 h-10 text-white"
+                    className="w-6 h-6 text-white"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -365,144 +519,168 @@ export default function ProfilePage() {
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth={2}
-                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                     />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Property Management
-                </h3>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                  Manage all your properties, view listings, update
-                  availability, and track bookings from a centralized dashboard
-                </p>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Manage Property
+                </h2>
               </div>
 
-              <div className="grid sm:grid-cols-3 gap-4 mb-6">
+              <div className="bg-linear-to-br from-purple-50 via-purple-100 to-indigo-50 rounded-2xl p-8 border-2 border-purple-200">
+                <div className="text-center mb-6">
+                  <div className="w-20 h-20 bg-linear-to-br from-purple-500 to-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform">
+                    <svg
+                      className="w-10 h-10 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    Property Management
+                  </h3>
+                  <p className="text-gray-600 max-w-2xl mx-auto">
+                    Manage all your properties, view listings, update
+                    availability, and track bookings from a centralized
+                    dashboard
+                  </p>
+                </div>
+
+                <div className="grid sm:grid-cols-3 gap-4 mb-6">
+                  <button
+                    onClick={() => router.push("/admin/properties/new")}
+                    className="bg-white rounded-xl p-4 shadow-sm border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-200 group cursor-pointer transform hover:scale-105"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-500 transition-colors duration-200">
+                        <svg
+                          className="w-5 h-5 text-purple-600 group-hover:text-white transition-colors duration-200"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 4v16m8-8H4"
+                          />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <p className="text-sm text-gray-600 group-hover:text-purple-600 transition-colors duration-200">
+                          Add New
+                        </p>
+                        <p className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors duration-200">
+                          Property
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 text-indigo-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Edit & Update</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          Listings
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
+                        <svg
+                          className="w-5 h-5 text-pink-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                          />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">View</p>
+                        <p className="text-lg font-bold text-gray-900">
+                          Analytics
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <button
-                  onClick={() => router.push("/admin/properties/new")}
-                  className="bg-white rounded-xl p-4 shadow-sm border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-200 group cursor-pointer transform hover:scale-105"
+                  onClick={() => router.push("/admin/properties")}
+                  className="w-full py-4 bg-linear-to-r from-purple-600 via-purple-700 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:via-purple-800 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 font-semibold text-lg group mb-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-500 transition-colors duration-200">
-                      <svg
-                        className="w-5 h-5 text-purple-600 group-hover:text-white transition-colors duration-200"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
-                    </div>
-                    <div className="text-left">
-                      <p className="text-sm text-gray-600 group-hover:text-purple-600 transition-colors duration-200">
-                        Add New
-                      </p>
-                      <p className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors duration-200">
-                        Property
-                      </p>
-                    </div>
-                  </div>
+                  <svg
+                    className="w-6 h-6 group-hover:scale-110 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                  </svg>
+                  Go to Property Management Dashboard
+                  <svg
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7l5 5m0 0l-5 5m5-5H6"
+                    />
+                  </svg>
                 </button>
-
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-indigo-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Edit & Update</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        Listings
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl p-4 shadow-sm border border-purple-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                      <svg
-                        className="w-5 h-5 text-pink-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">View</p>
-                      <p className="text-lg font-bold text-gray-900">
-                        Analytics
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
-
-              <button
-                onClick={() => router.push("/admin/properties")}
-                className="w-full py-4 bg-linear-to-r from-purple-600 via-purple-700 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:via-purple-800 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3 font-semibold text-lg group mb-4"
-              >
-                <svg
-                  className="w-6 h-6 group-hover:scale-110 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-                Go to Property Management Dashboard
-                <svg
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 7l5 5m0 0l-5 5m5-5H6"
-                  />
-                </svg>
-              </button>
             </div>
-          </div>
+          </>
         ) : (
           <>
             <div className="bg-white rounded-2xl shadow-lg p-6 mt-6 hover:shadow-xl transition-shadow">
