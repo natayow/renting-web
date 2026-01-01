@@ -25,10 +25,27 @@ interface UserProfile {
   createdAt: string;
 }
 
+interface Booking {
+  id: string;
+  checkInDate: string;
+  checkOutDate: string;
+  status: string;
+  totalPriceIdr: number;
+  property: {
+    id: string;
+    title: string;
+  };
+  room: {
+    id: string;
+    name: string;
+  } | null;
+}
+
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -63,8 +80,31 @@ export default function ProfilePage() {
       }
     };
 
+    const fetchBookings = async () => {
+      if (!session?.user?.accessToken) return;
+
+      // Only fetch bookings for USER role
+      if (session.user.role?.toUpperCase() !== "USER") return;
+
+      try {
+        const response = await axiosInstance.get(`/api/bookings/user/me`, {
+          headers: {
+            Authorization: `Bearer ${session.user.accessToken}`,
+          },
+        });
+
+        if (response.data.success) {
+          setBookings(response.data.data);
+        }
+      } catch (err: any) {
+        console.error("Error fetching bookings:", err);
+        // Don't set error for bookings, just log it
+      }
+    };
+
     if (session) {
       fetchProfile();
+      fetchBookings();
     }
   }, [session]);
 
@@ -464,90 +504,183 @@ export default function ProfilePage() {
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-2xl shadow-lg p-6 mt-6 hover:shadow-xl transition-shadow">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Account Statistics
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-blue-600 font-medium mb-1">
-                      Total Bookings
-                    </p>
-                    <p className="text-3xl font-bold text-blue-900">0</p>
-                  </div>
-                  <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-green-600 font-medium mb-1">
-                      Favorites
-                    </p>
-                    <p className="text-3xl font-bold text-green-900">0</p>
-                  </div>
-                  <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                      />
-                    </svg>
+          <>
+            <div className="bg-white rounded-2xl shadow-lg p-6 mt-6 hover:shadow-xl transition-shadow">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                Account Statistics
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="bg-linear-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-blue-600 font-medium mb-1">
+                        Total Bookings
+                      </p>
+                      <p className="text-3xl font-bold text-blue-900">
+                        {bookings.length}
+                      </p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-purple-600 font-medium mb-1">
-                      Reviews
-                    </p>
-                    <p className="text-3xl font-bold text-purple-900">0</p>
+                <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-green-600 font-medium mb-1">
+                        Favorites
+                      </p>
+                      <p className="text-3xl font-bold text-green-900">0</p>
+                    </div>
+                    <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
+                      </svg>
+                    </div>
                   </div>
-                  <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                      />
-                    </svg>
+                </div>
+
+                <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-purple-600 font-medium mb-1">
+                        Reviews
+                      </p>
+                      <p className="text-3xl font-bold text-purple-900">0</p>
+                    </div>
+                    <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+
+            {/* Bookings List */}
+            {bookings.length > 0 && (
+              <div className="bg-white rounded-2xl shadow-lg p-6 mt-6 hover:shadow-xl transition-shadow">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  My Bookings
+                </h2>
+                <div className="space-y-4">
+                  {bookings.map((booking) => (
+                    <div
+                      key={booking.id}
+                      className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() =>
+                        router.push(`/booking/success?bookingId=${booking.id}`)
+                      }
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                            {booking.property.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-2">
+                            Room: {booking.room?.name || "N/A"}
+                          </p>
+                          <div className="flex flex-wrap gap-3 text-sm text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
+                              {new Date(booking.checkInDate).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                }
+                              )}
+                              {" → "}
+                              {new Date(
+                                booking.checkOutDate
+                              ).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                              booking.status === "CONFIRMED"
+                                ? "bg-green-100 text-green-800"
+                                : booking.status === "WAITING_CONFIRMATION"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : booking.status === "WAITING_PAYMENT"
+                                ? "bg-orange-100 text-orange-800"
+                                : booking.status === "CANCELED"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {booking.status.replace(/_/g, " ")}
+                          </span>
+                          <p className="text-lg font-bold text-[#064749]">
+                            {new Intl.NumberFormat("id-ID", {
+                              style: "currency",
+                              currency: "IDR",
+                              minimumFractionDigits: 0,
+                              maximumFractionDigits: 0,
+                            }).format(booking.totalPriceIdr)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

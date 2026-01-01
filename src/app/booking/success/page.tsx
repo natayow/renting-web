@@ -352,7 +352,7 @@ export default function BookingSuccessPage() {
             View My Bookings
           </button>
           <button
-            className="bg-white text-[#064749] px-6 py-3 border-[#064749] border-1 rounded-lg hover:bg-[#053638] hover:text-white transition-all font-medium w-full"
+            className="bg-white text-[#064749] px-6 py-3 border-[#064749] border rounded-lg hover:bg-[#053638] hover:text-white transition-all font-medium w-full"
             onClick={() => router.push("/properties")}
           >
             Browse More Properties

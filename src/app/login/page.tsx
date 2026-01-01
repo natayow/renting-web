@@ -107,7 +107,7 @@ export default function Login() {
               <div className="form-control mt-6">
                 <button
                   type="submit"
-                  className=" rounded-lg btn bg-[#064749] w-full"
+                  className=" rounded-lg btn bg-[#064749] text-white w-full"
                 >
                   Login
                 </button>

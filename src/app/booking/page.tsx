@@ -455,7 +455,7 @@ export default function BookingPage() {
                     )}
 
                     <button
-                      className={`btn btn-primary w-full ${
+                      className={`bg-[#064749] text-white w-full px-6 py-3 rounded-lg hover:bg-[#053638] transition-all font-medium ${
                         loading ? "loading" : ""
                       }`}
                       onClick={handleSubmitBooking}
