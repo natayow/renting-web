@@ -8,6 +8,7 @@ import Image from "next/image";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./datepicker.css";
+import { toast } from "react-toastify";
 import {
   IoBedOutline,
   IoWaterOutline,
@@ -202,6 +203,40 @@ export default function PropertyDetailPage() {
       router.push("/login");
       return;
     }
+
+    // Validate booking inputs
+    if (!selectedRoom) {
+      toast.error("Please select a room");
+      return;
+    }
+
+    if (!moveInDate || !moveOutDate) {
+      toast.error("Please select check-in and check-out dates");
+      return;
+    }
+
+    if (moveInDate >= moveOutDate) {
+      toast.error("Check-out date must be after check-in date");
+      return;
+    }
+
+    // Calculate nights
+    const nights = Math.ceil(
+      (moveOutDate.getTime() - moveInDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    // Create booking query parameters
+    const bookingParams = new URLSearchParams({
+      propertyId: property?.id || "",
+      roomId: selectedRoom.id,
+      checkInDate: moveInDate.toISOString(),
+      checkOutDate: moveOutDate.toISOString(),
+      nights: nights.toString(),
+      guestsCount: guests.toString(),
+    });
+
+    // Navigate to booking page
+    router.push(`/booking?${bookingParams.toString()}`);
   };
 
   const handleGuestChange = (increment: boolean) => {
