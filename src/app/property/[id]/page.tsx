@@ -357,7 +357,7 @@ export default function PropertyDetailPage() {
           </div>
 
           {property.images && property.images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto py-2">
+            <div className="flex gap-3 overflow-x-auto pl-2 py-2">
               {property.images.map((image, index) => (
                 <button
                   key={image.id}
