@@ -339,14 +339,14 @@ export default function PropertyDetailPage() {
     <div className="min-h-screen mt-20 bg-gray-50 py-8">
       <div className="container mx-auto px-4">
         <div className="mb-8">
-          <div className="relative w-full h-96 rounded-2xl overflow-hidden bg-gray-200 mb-4">
+          <div className="relative w-full h-[500px] rounded-2xl overflow-hidden bg-gray-200 mb-4 shadow-lg">
             {property.images && property.images.length > 0 ? (
               <Image
                 src={`http://localhost:8000/uploads/images/${property.images[selectedImageIndex].url}`}
                 alt={property.title}
                 fill
                 unoptimized
-                className="object-cover"
+                className="object-contain bg-gray-900"
                 priority
               />
             ) : (
@@ -357,16 +357,16 @@ export default function PropertyDetailPage() {
           </div>
 
           {property.images && property.images.length > 1 && (
-            <div className="grid grid-cols-5 gap-4">
-              {property.images.slice(0, 5).map((image, index) => (
+            <div className="flex gap-3 overflow-x-auto py-2">
+              {property.images.map((image, index) => (
                 <button
                   key={image.id}
                   onClick={() => setSelectedImageIndex(index)}
-                  className={`relative w-full aspect-square rounded-lg overflow-hidden ${
+                  className={`relative h-20 w-28 rounded-lg overflow-hidden shadow-md flex-shrink-0 ${
                     selectedImageIndex === index
-                      ? "ring-2 ring-[#064749]"
-                      : "opacity-70 hover:opacity-100"
-                  } transition`}
+                      ? "ring-4 ring-[#064749] scale-105"
+                      : "opacity-70 hover:opacity-100 hover:scale-105"
+                  } transition-all duration-200`}
                 >
                   <Image
                     src={`http://localhost:8000/uploads/images/${image.url}`}
