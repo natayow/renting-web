@@ -31,15 +31,15 @@ interface Property {
   id: string;
   title: string;
   description: string | null;
-  basePricePerNightIdr: number;
-  maxGuests: number;
-  bedrooms: number;
-  beds: number;
-  bathrooms: number;
   status: string;
   images: PropertyImage[];
   location: Location;
   type: PropertyType | null;
+  minPricePerNight?: number;
+  rooms?: Array<{
+    id: string;
+    basePricePerNightIdr: number;
+  }>;
 }
 
 interface ApiResponse {
@@ -88,6 +88,23 @@ export default function PropertyList() {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
+  };
+
+  const getPriceDisplay = (property: Property) => {
+    if (property.rooms && property.rooms.length > 0) {
+      const prices = property.rooms.map((room) => room.basePricePerNightIdr);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
+      if (minPrice === maxPrice) {
+        return `${formatPrice(minPrice)} / night`;
+      }
+
+      return `${formatPrice(minPrice)} - ${formatPrice(maxPrice)} / night`;
+    }
+
+    const price = property.minPricePerNight || 0;
+    return price > 0 ? `${formatPrice(price)} / night` : "Price not available";
   };
 
   if (loading) {
@@ -213,7 +230,7 @@ export default function PropertyList() {
                   {property.location.city || property.location.name}
                 </p>
                 <p className="text-gray-600 font-extralight text-sm">
-                  {formatPrice(property.basePricePerNightIdr)} / night
+                  {getPriceDisplay(property)}
                 </p>
               </div>
             </Link>

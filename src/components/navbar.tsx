@@ -288,10 +288,12 @@ export default function Navbar() {
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-start gap-3">
                       {session?.user?.role === "ADMIN" ? (
-                        <Link
-                          href="/add-property"
+                        <div
                           className="flex-1 cursor-pointer hover:opacity-80 transition-opacity"
-                          onClick={() => setIsMenuOpen(false)}
+                          onClick={() => {
+                            router.push("/admin/properties/new");
+                            setIsMenuOpen(false);
+                          }}
                         >
                           <h3 className="font-semibold text-gray-900 text-sm mb-1">
                             Add property to rent
@@ -299,7 +301,7 @@ export default function Navbar() {
                           <p className="text-xs text-gray-600">
                             List a new property for tenants to rent.
                           </p>
-                        </Link>
+                        </div>
                       ) : (
                         <Link
                           href="/become-tenant"

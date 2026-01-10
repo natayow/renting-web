@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { FaGoogle, FaFacebook, FaTwitter } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import { loginSchema } from "./schemas/loginSchema";
@@ -10,6 +10,16 @@ import { Formik, useFormik } from "formik";
 import { signIn } from "next-auth/react";
 
 export default function Login() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message) {
+      toast.success(message);
+    }
+  }, [searchParams]);
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -22,7 +32,6 @@ export default function Login() {
         password: values?.password,
         redirect: false,
       });
-      console.log(response);
       if (response?.ok) {
         toast.success("Login successful!");
         router.push("/");
@@ -32,7 +41,6 @@ export default function Login() {
     },
   });
 
-  const router = useRouter();
   const onHandleSearch = (e: React.FormEvent) => {
     e.preventDefault();
   };
@@ -108,7 +116,7 @@ export default function Login() {
               <div className="form-control mt-6">
                 <button
                   type="submit"
-                  className=" rounded-lg btn bg-[#064749] w-full"
+                  className=" rounded-lg btn bg-[#064749] text-white w-full"
                 >
                   Login
                 </button>

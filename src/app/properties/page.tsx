@@ -491,12 +491,6 @@ export default function PropertiesPage() {
                     <p className="text-sm text-gray-500 mb-2">
                       {property.location.city}, {property.location.country}
                     </p>
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm text-gray-600">
-                        {property.maxGuests} guests · {property.bedrooms} bed
-                        {property.bedrooms !== 1 ? "rooms" : "room"}
-                      </p>
-                    </div>
                     <p className="text-lg font-bold text-gray-900 mt-2">
                       {formatPrice(property.minPricePerNight)}{" "}
                       <span className="text-sm font-normal text-gray-600">
