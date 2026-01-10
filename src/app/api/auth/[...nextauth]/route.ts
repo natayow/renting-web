@@ -22,7 +22,6 @@ const handler = NextAuth({
         password: { label: 'password', type: 'text' },
       },
       async authorize(_) {
-        // ini yg pertama kali di trigger pada saat login
         try {
           const response = await axios.post<LoginResponse>(
             'http://localhost:8000/api/auth/login', { email: _?.email, password: _?.password },
@@ -50,7 +49,7 @@ const handler = NextAuth({
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }) {

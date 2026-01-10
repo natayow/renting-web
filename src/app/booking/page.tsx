@@ -46,7 +46,6 @@ export default function BookingPage() {
   const [calculating, setCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Form data from URL params
   const [propertyId] = useState(searchParams.get("propertyId") || "");
   const [roomId] = useState(searchParams.get("roomId") || "");
   const [checkInDate] = useState(searchParams.get("checkInDate") || "");
@@ -69,7 +68,6 @@ export default function BookingPage() {
     }
 
     if (status === "authenticated") {
-      // Validate required params
       if (!propertyId || !roomId || !checkInDate || !checkOutDate) {
         setError("Missing required booking information");
         return;
@@ -84,7 +82,6 @@ export default function BookingPage() {
     setError(null);
 
     try {
-      // Fetch property details
       const propertyResponse = await axiosInstance.get<ApiResponse<any>>(
         `/api/properties/${propertyId}`
       );
@@ -97,7 +94,6 @@ export default function BookingPage() {
           location: property.location,
         });
 
-        // Find room details
         const room = property.rooms?.find((r: any) => r.id === roomId);
         if (room) {
           setRoomDetails({
@@ -110,7 +106,6 @@ export default function BookingPage() {
         }
       }
 
-      // Calculate price
       const priceResponse = await axiosInstance.post<
         ApiResponse<BookingPriceBreakdown>
       >(`/api/bookings/calculate-price`, {
@@ -164,7 +159,6 @@ export default function BookingPage() {
         session.user.accessToken.substring(0, 20) + "..."
       );
 
-      // Manually add token to headers as a backup
       const response = await axiosInstance.post<ApiResponse<BookingResponse>>(
         `/api/bookings`,
         bookingData,
@@ -178,7 +172,6 @@ export default function BookingPage() {
       if (response.data.success) {
         const booking = response.data.data;
 
-        // Redirect to success page
         router.push(`/booking/success?bookingId=${booking.id}`);
       } else {
         setError(response.data.message);

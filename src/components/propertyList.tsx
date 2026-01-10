@@ -35,7 +35,7 @@ interface Property {
   images: PropertyImage[];
   location: Location;
   type: PropertyType | null;
-  minPricePerNight?: number; // Minimum room price calculated by backend
+  minPricePerNight?: number;
   rooms?: Array<{
     id: string;
     basePricePerNightIdr: number;

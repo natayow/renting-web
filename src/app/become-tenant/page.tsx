@@ -19,7 +19,6 @@ export default function BecomeTenantPage() {
       router.push("/login?callbackUrl=/become-tenant");
     }
 
-    // Redirect if user is already an ADMIN
     if (session?.user?.role?.toUpperCase() === "ADMIN") {
       router.push("/profile");
     }
@@ -51,7 +50,6 @@ export default function BecomeTenantPage() {
       if (response.data.success) {
         setSubmitSuccess(true);
 
-        // Sign out and redirect to login to get a new session with updated role
         setTimeout(async () => {
           await signOut({
             callbackUrl:

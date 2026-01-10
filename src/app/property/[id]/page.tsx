@@ -141,10 +141,9 @@ export default function PropertyDetailPage() {
         const propertyData = response.data.data;
         setProperty(propertyData);
 
-        // Auto-select the first room if rooms are available
         if (propertyData.rooms && propertyData.rooms.length > 0) {
           setSelectedRoom(propertyData.rooms[0]);
-          setGuests(1); // Set default guests to 1
+          setGuests(1);
         }
       } else {
         setError(response.data.message || "Failed to fetch property");
@@ -175,7 +174,6 @@ export default function PropertyDetailPage() {
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
 
-    // If all rooms have the same price
     if (minPrice === maxPrice) {
       return (
         <div className="flex items-baseline gap-2">
@@ -187,7 +185,6 @@ export default function PropertyDetailPage() {
       );
     }
 
-    // Show price range
     return (
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-bold text-[#064749]">
@@ -204,7 +201,6 @@ export default function PropertyDetailPage() {
       return;
     }
 
-    // Validate booking inputs
     if (!selectedRoom) {
       toast.error("Please select a room");
       return;
@@ -220,12 +216,10 @@ export default function PropertyDetailPage() {
       return;
     }
 
-    // Calculate nights
     const nights = Math.ceil(
       (moveOutDate.getTime() - moveInDate.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    // Create booking query parameters
     const bookingParams = new URLSearchParams({
       propertyId: property?.id || "",
       roomId: selectedRoom.id,
@@ -235,7 +229,6 @@ export default function PropertyDetailPage() {
       guestsCount: guests.toString(),
     });
 
-    // Navigate to booking page
     router.push(`/booking?${bookingParams.toString()}`);
   };
 

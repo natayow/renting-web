@@ -92,7 +92,6 @@ export default function ProfilePage() {
     const fetchBookings = async () => {
       if (!session?.user?.accessToken) return;
 
-      // Only fetch bookings for USER role
       if (session.user.role?.toUpperCase() !== "USER") return;
 
       try {
@@ -107,7 +106,6 @@ export default function ProfilePage() {
         }
       } catch (err: any) {
         console.error("Error fetching bookings:", err);
-        // Don't set error for bookings, just log it
       }
     };
 

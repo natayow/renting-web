@@ -8,11 +8,9 @@ const axiosInstance = axios.create({
     },
 });
 
-// Add request interceptor to include auth token
 axiosInstance.interceptors.request.use(
     async (config) => {
         try {
-            // Only fetch session if no Authorization header is already set
             if (!config.headers.Authorization) {
                 const session = await getSession();
                 if (session?.user?.accessToken) {
@@ -29,14 +27,12 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-// Add response interceptor for better error handling
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             console.error('Unauthorized request:', error.config.url);
-            // Optionally redirect to login
-            // window.location.href = '/login';
+           
         }
         return Promise.reject(error);
     }
