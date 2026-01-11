@@ -104,73 +104,7 @@ export default function Navbar() {
                 className="outline-none text-sm text-gray-900 placeholder-gray-600 bg-transparent w-full font-medium"
               />
             </div>
-            <div className="h-8 w-px bg-gray-300"></div>
-            <div className="flex items-center gap-2 px-5 py-3 cursor-pointer hover:bg-gray-50 transition-colors whitespace-nowrap">
-              <svg
-                className="w-5 h-5 text-gray-600 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              <span className="text-sm text-gray-600 font-medium">Move-in</span>
-              <svg
-                className="w-4 h-4 text-gray-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-              <span className="text-sm text-gray-600 font-medium">
-                Move-out
-              </span>
-            </div>
-            <div className="h-8 w-px bg-gray-300"></div>
-            <div className="flex items-center gap-3 px-5 py-3 cursor-pointer hover:bg-gray-50 transition-colors whitespace-nowrap">
-              <svg
-                className="w-5 h-5 text-gray-600 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-              <span className="text-sm text-gray-600 font-medium">Guests</span>
-              <div className="flex items-center gap-2 ml-1">
-                <button
-                  type="button"
-                  className="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center text-gray-700 hover:border-gray-600 hover:bg-gray-50 transition-all font-medium text-lg"
-                >
-                  +
-                </button>
-                <span className="text-sm font-semibold text-gray-900 min-w-5 text-center">
-                  1
-                </span>
-                <button
-                  type="button"
-                  className="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center text-gray-700 hover:border-gray-600 hover:bg-gray-50 transition-all font-medium text-lg pb-0.5"
-                >
-                  −
-                </button>
-              </div>
-            </div>
+
             <button
               type="submit"
               className="bg-[#064749] text-white pl-8 pr-10 py-3 rounded-r-full hover:bg-[#053638] transition-all font-semibold text-base"
@@ -242,7 +176,7 @@ export default function Navbar() {
                     value={mobileSearchQuery}
                     onChange={(e) => setMobileSearchQuery(e.target.value)}
                     placeholder="Search properties..."
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-1 text-gray-600 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     autoFocus
                   />
                   <button
