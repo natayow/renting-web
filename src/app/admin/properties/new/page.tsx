@@ -45,6 +45,7 @@ export default function NewPropertyPage() {
   const [error, setError] = useState("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const formik = useFormik<CreatePropertyFormData>({
     initialValues: {
@@ -79,55 +80,64 @@ export default function NewPropertyPage() {
         return;
       }
 
-      try {
-        setLoading(true);
-        setError("");
-
-        const formData = new FormData();
-        formData.append("adminUserId", session?.user?.id || "");
-        formData.append("title", values.title);
-        if (values.description)
-          formData.append("description", values.description);
-        formData.append("typeId", values.typeId);
-        formData.append("city", values.city);
-        formData.append("country", values.country);
-        formData.append("address", values.address);
-        formData.append("status", values.status);
-
-        formData.append("rooms", JSON.stringify(values.rooms));
-
-        if (values.facilityIds && values.facilityIds.length > 0) {
-          formData.append("facilityIds", JSON.stringify(values.facilityIds));
-        }
-
-        selectedImages.forEach((image) => {
-          formData.append("propertyImages", image);
-        });
-
-        const response = await axiosInstance.post("/api/properties", formData, {
-          headers: {
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        if (response.data.success) {
-          toast.success("Property created successfully!");
-          router.push("/");
-        }
-      } catch (err: any) {
-        console.error("Error creating property:", err);
-        console.error("Error response:", err.response?.data);
-        const errorMessage =
-          err.response?.data?.message ||
-          err.response?.data?.errors?.map((e: any) => e.msg).join(", ") ||
-          "Failed to create property. Please try again.";
-        setError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
+      setShowConfirmModal(true);
     },
   });
+
+  const handleConfirmSubmit = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      setShowConfirmModal(false);
+
+      const formData = new FormData();
+      formData.append("adminUserId", session?.user?.id || "");
+      formData.append("title", formik.values.title);
+      if (formik.values.description)
+        formData.append("description", formik.values.description);
+      formData.append("typeId", formik.values.typeId);
+      formData.append("city", formik.values.city);
+      formData.append("country", formik.values.country);
+      formData.append("address", formik.values.address);
+      formData.append("status", formik.values.status);
+
+      formData.append("rooms", JSON.stringify(formik.values.rooms));
+
+      if (formik.values.facilityIds && formik.values.facilityIds.length > 0) {
+        formData.append(
+          "facilityIds",
+          JSON.stringify(formik.values.facilityIds)
+        );
+      }
+
+      selectedImages.forEach((image) => {
+        formData.append("propertyImages", image);
+      });
+
+      const response = await axiosInstance.post("/api/properties", formData, {
+        headers: {
+          Authorization: `Bearer ${session?.user?.accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.success) {
+        toast.success("Property created successfully!");
+        router.push("/");
+      }
+    } catch (err: any) {
+      console.error("Error creating property:", err);
+      console.error("Error response:", err.response?.data);
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.errors?.map((e: any) => e.msg).join(", ") ||
+        "Failed to create property. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -844,6 +854,91 @@ export default function NewPropertyPage() {
             </button>
           </div>
         </form>
+
+        {/* Confirmation Modal */}
+        {showConfirmModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all">
+              <div className="flex items-center justify-center w-16 h-16 bg-[#064749] bg-opacity-10 rounded-full mx-auto mb-6">
+                <FaHome className="text-[#064749] text-3xl" />
+              </div>
+
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-4">
+                Confirm Property Creation
+              </h3>
+
+              <p className="text-gray-600 text-center mb-6">
+                Are you sure you want to create this property? Please review all
+                the details before confirming.
+              </p>
+
+              <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Property:</span>
+                  <span className="font-semibold text-gray-900">
+                    {formik.values.title}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Location:</span>
+                  <span className="font-semibold text-gray-900">
+                    {formik.values.city}, {formik.values.country}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Rooms:</span>
+                  <span className="font-semibold text-gray-900">
+                    {formik.values.rooms.length}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Facilities:</span>
+                  <span className="font-semibold text-gray-900">
+                    {formik.values.facilityIds.length}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Images:</span>
+                  <span className="font-semibold text-gray-900">
+                    {selectedImages.length}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Status:</span>
+                  <span className="font-semibold text-gray-900">
+                    {formik.values.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmModal(false)}
+                  disabled={loading}
+                  className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all font-semibold disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmSubmit}
+                  disabled={loading}
+                  className="flex-1 py-3 bg-linear-to-r from-[#064749] to-[#0a9399] text-white rounded-xl hover:from-[#053638] hover:to-[#087174] transition-all shadow-lg hover:shadow-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Creating...
+                    </span>
+                  ) : (
+                    "Confirm"
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
