@@ -52,6 +52,8 @@ export default function EditRoomPage() {
   const [saving, setSaving] = useState(false);
   const [propertyTitle, setPropertyTitle] = useState("");
   const [roomName, setRoomName] = useState("");
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [pendingFormValues, setPendingFormValues] = useState<any>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -128,25 +130,34 @@ export default function EditRoomPage() {
     },
     validationSchema: roomSchema,
     onSubmit: async (values) => {
-      try {
-        setSaving(true);
-
-        await axiosInstance.put(`/api/rooms/${roomId}`, values, {
-          headers: {
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
-        });
-
-        toast.success("Room updated successfully");
-        router.push(`/admin/properties/${propertyId}`);
-      } catch (err: any) {
-        console.error("Error updating room:", err);
-        toast.error(err.response?.data?.message || "Failed to update room");
-      } finally {
-        setSaving(false);
-      }
+      setPendingFormValues(values);
+      setUpdateModalOpen(true);
     },
   });
+
+  const handleConfirmUpdate = async () => {
+    if (!pendingFormValues) return;
+
+    try {
+      setSaving(true);
+
+      await axiosInstance.put(`/api/rooms/${roomId}`, pendingFormValues, {
+        headers: {
+          Authorization: `Bearer ${session?.user?.accessToken}`,
+        },
+      });
+
+      toast.success("Room updated successfully");
+      setUpdateModalOpen(false);
+      setPendingFormValues(null);
+      router.push(`/admin/properties/${propertyId}`);
+    } catch (err: any) {
+      console.error("Error updating room:", err);
+      toast.error(err.response?.data?.message || "Failed to update room");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -371,6 +382,60 @@ export default function EditRoomPage() {
           </div>
         </form>
       </div>
+
+      {updateModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <FaSave className="text-blue-600 text-2xl" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Update Room?
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to save these changes to{" "}
+                <span className="font-semibold">{roomName}</span>? This will
+                update all room details including pricing, capacity, and
+                facilities.
+              </p>
+              <p className="text-sm text-gray-500 bg-yellow-50 p-3 rounded-lg">
+                <strong>Note:</strong> Existing bookings will not be affected by
+                these changes.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setUpdateModalOpen(false);
+                  setPendingFormValues(null);
+                }}
+                disabled={saving}
+                className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all font-medium disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmUpdate}
+                disabled={saving}
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <FaSave />
+                    Confirm Update
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

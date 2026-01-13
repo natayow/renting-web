@@ -63,6 +63,12 @@ export default function PropertyManagementPage() {
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [propertyToDelete, setPropertyToDelete] = useState<string | null>(null);
+  const [statusChangeModalOpen, setStatusChangeModalOpen] = useState(false);
+  const [statusChangeData, setStatusChangeData] = useState<{
+    propertyId: string;
+    newStatus: "DRAFT" | "ACTIVE" | "INACTIVE";
+    propertyTitle: string;
+  } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -170,6 +176,8 @@ export default function PropertyManagementPage() {
         )
       );
       toast.success("Property status updated successfully");
+      setStatusChangeModalOpen(false);
+      setStatusChangeData(null);
     } catch (err: any) {
       console.error("Error updating status:", err);
       toast.error(err.response?.data?.message || "Failed to update status");
@@ -491,12 +499,18 @@ export default function PropertyManagementPage() {
                   <div className="mt-3">
                     <select
                       value={property.status}
-                      onChange={(e) =>
-                        handleStatusChange(
-                          property.id,
-                          e.target.value as "DRAFT" | "ACTIVE" | "INACTIVE"
-                        )
-                      }
+                      onChange={(e) => {
+                        const newStatus = e.target.value as
+                          | "DRAFT"
+                          | "ACTIVE"
+                          | "INACTIVE";
+                        setStatusChangeData({
+                          propertyId: property.id,
+                          newStatus: newStatus,
+                          propertyTitle: property.title,
+                        });
+                        setStatusChangeModalOpen(true);
+                      }}
                       className="w-full text-gray-600 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
                     >
                       <option value="DRAFT">Draft</option>
@@ -543,6 +557,85 @@ export default function PropertyManagementPage() {
                 className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {statusChangeModalOpen && statusChangeData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <FaEdit className="text-blue-600 text-2xl" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Update Property Status?
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to change the status of{" "}
+                <span className="font-semibold">
+                  {statusChangeData.propertyTitle}
+                </span>{" "}
+                to{" "}
+                <span
+                  className={`font-semibold ${
+                    statusChangeData.newStatus === "ACTIVE"
+                      ? "text-green-600"
+                      : statusChangeData.newStatus === "INACTIVE"
+                      ? "text-red-600"
+                      : "text-yellow-600"
+                  }`}
+                >
+                  {statusChangeData.newStatus}
+                </span>
+                ?
+              </p>
+              {statusChangeData.newStatus === "ACTIVE" && (
+                <p className="text-sm text-gray-500 bg-green-50 p-3 rounded-lg">
+                  This property will be visible to users and available for
+                  booking.
+                </p>
+              )}
+              {statusChangeData.newStatus === "INACTIVE" && (
+                <p className="text-sm text-gray-500 bg-red-50 p-3 rounded-lg">
+                  This property will be hidden from users and unavailable for
+                  booking.
+                </p>
+              )}
+              {statusChangeData.newStatus === "DRAFT" && (
+                <p className="text-sm text-gray-500 bg-yellow-50 p-3 rounded-lg">
+                  This property will remain as a draft and not visible to users.
+                </p>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setStatusChangeModalOpen(false);
+                  setStatusChangeData(null);
+                }}
+                className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() =>
+                  handleStatusChange(
+                    statusChangeData.propertyId,
+                    statusChangeData.newStatus
+                  )
+                }
+                className={`flex-1 px-6 py-3 text-white rounded-xl hover:opacity-90 transition-all font-medium ${
+                  statusChangeData.newStatus === "ACTIVE"
+                    ? "bg-green-600"
+                    : statusChangeData.newStatus === "INACTIVE"
+                    ? "bg-red-600"
+                    : "bg-yellow-600"
+                }`}
+              >
+                Confirm
               </button>
             </div>
           </div>

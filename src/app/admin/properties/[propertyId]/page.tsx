@@ -86,6 +86,13 @@ export default function EditPropertyPage() {
   );
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [showRoomModal, setShowRoomModal] = useState(false);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [pendingFormValues, setPendingFormValues] = useState<any>(null);
+  const [deleteRoomModalOpen, setDeleteRoomModalOpen] = useState(false);
+  const [roomToDelete, setRoomToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -159,29 +166,40 @@ export default function EditPropertyPage() {
     },
     validationSchema: propertySchema,
     onSubmit: async (values) => {
-      try {
-        setSaving(true);
-
-        await axiosInstance.put(`/api/properties/${propertyId}`, values, {
-          headers: {
-            Authorization: `Bearer ${session?.user?.accessToken}`,
-          },
-        });
-
-        toast.success("Property updated successfully");
-        router.push("/admin/properties");
-      } catch (err: any) {
-        console.error("Error updating property:", err);
-        toast.error(err.response?.data?.message || "Failed to update property");
-      } finally {
-        setSaving(false);
-      }
+      setPendingFormValues(values);
+      setUpdateModalOpen(true);
     },
   });
 
-  const handleDeleteRoom = async (roomId: string) => {
-    if (!confirm("Are you sure you want to delete this room?")) return;
+  const handleConfirmUpdate = async () => {
+    if (!pendingFormValues) return;
 
+    try {
+      setSaving(true);
+
+      await axiosInstance.put(
+        `/api/properties/${propertyId}`,
+        pendingFormValues,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.user?.accessToken}`,
+          },
+        }
+      );
+
+      toast.success("Property updated successfully");
+      setUpdateModalOpen(false);
+      setPendingFormValues(null);
+      router.push("/admin/properties");
+    } catch (err: any) {
+      console.error("Error updating property:", err);
+      toast.error(err.response?.data?.message || "Failed to update property");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteRoom = async (roomId: string) => {
     try {
       await axiosInstance.delete(`/api/rooms/${roomId}`, {
         headers: {
@@ -199,6 +217,8 @@ export default function EditPropertyPage() {
       );
 
       toast.success("Room deleted successfully");
+      setDeleteRoomModalOpen(false);
+      setRoomToDelete(null);
     } catch (err: any) {
       console.error("Error deleting room:", err);
       toast.error(err.response?.data?.message || "Failed to delete room");
@@ -586,7 +606,10 @@ export default function EditPropertyPage() {
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDeleteRoom(room.id)}
+                          onClick={() => {
+                            setRoomToDelete({ id: room.id, name: room.name });
+                            setDeleteRoomModalOpen(true);
+                          }}
                           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all flex items-center justify-center gap-2 font-medium"
                         >
                           <FaTrash />
@@ -600,6 +623,95 @@ export default function EditPropertyPage() {
           </div>
         )}
       </div>
+
+      {updateModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <FaSave className="text-blue-600 text-2xl" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Update Property?
+              </h3>
+              <p className="text-gray-600">
+                Are you sure you want to save these changes to the property?
+                This will update all property details including title,
+                description, location, and facilities.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setUpdateModalOpen(false);
+                  setPendingFormValues(null);
+                }}
+                disabled={saving}
+                className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all font-medium disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmUpdate}
+                disabled={saving}
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <FaSave />
+                    Confirm Update
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteRoomModalOpen && roomToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <FaTrash className="text-red-600 text-2xl" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                Delete Room?
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Are you sure you want to delete{" "}
+                <span className="font-semibold">{roomToDelete.name}</span>? This
+                action cannot be undone and will delete all room images and
+                booking history.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setDeleteRoomModalOpen(false);
+                  setRoomToDelete(null);
+                }}
+                className="flex-1 px-6 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() =>
+                  roomToDelete && handleDeleteRoom(roomToDelete.id)
+                }
+                className="flex-1 px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all font-medium"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

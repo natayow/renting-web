@@ -100,7 +100,7 @@ export default function Navbar() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name, city, or address"
+                placeholder="Search place to rent by name, city, or address"
                 className="outline-none text-sm text-gray-900 placeholder-gray-600 bg-transparent w-full font-medium"
               />
             </div>
