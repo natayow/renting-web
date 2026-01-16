@@ -17,6 +17,7 @@ import {
   FaSave,
   FaArrowLeft,
   FaEdit,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -604,6 +605,18 @@ export default function EditPropertyPage() {
                         >
                           <FaEdit />
                           Edit
+                        </button>
+                        <button
+                          onClick={() =>
+                            router.push(
+                              `/admin/properties/${propertyId}/rooms/${room.id}/peak-season`
+                            )
+                          }
+                          className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 font-medium"
+                          title="Manage Peak Season Rates & Availability"
+                        >
+                          <FaCalendarAlt />
+                          Peak Season
                         </button>
                         <button
                           onClick={() => {
