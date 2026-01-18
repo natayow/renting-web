@@ -26,6 +26,8 @@ export default function BookingSuccessPage() {
   const [booking, setBooking] = useState<BookingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pollingCount, setPollingCount] = useState(0);
+  const [completing, setCompleting] = useState(false);
 
   const bookingId = searchParams.get("bookingId");
 
@@ -37,8 +39,46 @@ export default function BookingSuccessPage() {
 
     if (status === "authenticated" && bookingId) {
       fetchBookingDetails();
+
+      // Poll for status updates for up to 30 seconds (10 polls x 3 seconds)
+      const pollInterval = setInterval(() => {
+        setPollingCount((prev) => {
+          if (prev >= 10) {
+            clearInterval(pollInterval);
+            return prev;
+          }
+          fetchBookingDetails();
+          return prev + 1;
+        });
+      }, 3000); // Check every 3 seconds
+
+      return () => clearInterval(pollInterval);
     }
   }, [status, bookingId]);
+
+  // Stop polling if booking is confirmed
+  useEffect(() => {
+    if (booking?.status === BookingStatus.CONFIRMED) {
+      setPollingCount(10); // Stop polling
+    }
+  }, [booking?.status]);
+
+  const handleManualComplete = async () => {
+    if (!bookingId) return;
+
+    try {
+      setCompleting(true);
+      await axiosInstance.post(`/api/midtrans/complete/${bookingId}`);
+
+      // Refresh booking details after manual completion
+      await fetchBookingDetails();
+    } catch (err: any) {
+      console.error("Error completing payment:", err);
+      setError(err.response?.data?.message || "Failed to complete payment");
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   const fetchBookingDetails = async () => {
     if (!bookingId) {
@@ -95,14 +135,16 @@ export default function BookingSuccessPage() {
           message:
             "Your booking has been automatically confirmed. You'll receive a confirmation email shortly.",
           color: "green",
+          showComplete: false,
         };
       case BookingStatus.WAITING_PAYMENT:
         return {
           icon: <IoTimeOutline className="text-6xl text-yellow-500" />,
-          title: "Waiting for Payment",
+          title: "Processing Payment...",
           message:
-            "Please complete your payment to confirm this booking. You have 24 hours to complete the payment.",
+            "We're verifying your payment. This usually takes a few seconds. If paid in Midtrans sandbox, click the button below.",
           color: "yellow",
+          showComplete: true,
         };
       case BookingStatus.WAITING_CONFIRMATION:
         return {
@@ -111,6 +153,7 @@ export default function BookingSuccessPage() {
           message:
             "Your booking is pending confirmation. Please transfer the payment and wait for admin verification.",
           color: "blue",
+          showComplete: false,
         };
       default:
         return {
@@ -118,6 +161,7 @@ export default function BookingSuccessPage() {
           title: "Booking Created",
           message: "Your booking has been created successfully.",
           color: "gray",
+          showComplete: false,
         };
     }
   };
@@ -172,6 +216,24 @@ export default function BookingSuccessPage() {
             <p className="text-gray-600 max-w-xl mx-auto">
               {statusInfo.message}
             </p>
+
+            {/* Complete Payment Button for Sandbox Testing */}
+            {statusInfo.showComplete && (
+              <div className="mt-4">
+                <button
+                  onClick={handleManualComplete}
+                  className="btn btn-primary"
+                  disabled={completing}
+                >
+                  {completing
+                    ? "Completing..."
+                    : "✅ Complete Payment (Sandbox)"}
+                </button>
+                <p className="text-xs text-gray-500 mt-2">
+                  Auto-refreshing every 3 seconds...
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

@@ -172,7 +172,37 @@ export default function BookingPage() {
       if (response.data.success) {
         const booking = response.data.data;
 
-        router.push(`/booking/success?bookingId=${booking.id}`);
+        // If payment gateway and has token, open Midtrans Snap
+        if (paymentMethod === "PAYMENT_GATEWAY" && booking.paymentToken) {
+          if (window.snap) {
+            window.snap.pay(booking.paymentToken, {
+              onSuccess: function (result: any) {
+                console.log("Payment success:", result);
+                router.push(`/booking/success?bookingId=${booking.id}`);
+              },
+              onPending: function (result: any) {
+                console.log("Payment pending:", result);
+                router.push(`/booking/success?bookingId=${booking.id}`);
+              },
+              onError: function (result: any) {
+                console.log("Payment error:", result);
+                setError("Payment failed. Please try again.");
+                setLoading(false);
+              },
+              onClose: function () {
+                console.log("Payment popup closed");
+                setError("Payment cancelled. You can try again.");
+                setLoading(false);
+              },
+            });
+          } else {
+            console.error("Midtrans Snap not loaded");
+            setError("Payment system not ready. Please refresh the page.");
+            setLoading(false);
+          }
+        } else {
+          router.push(`/booking/success?bookingId=${booking.id}`);
+        }
       } else {
         setError(response.data.message);
       }
@@ -360,34 +390,109 @@ export default function BookingPage() {
             {/* Payment Method */}
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title text-gray-700">Payment Method</h2>
-                <select
-                  className="select text-gray-700 select-bordered w-full"
-                  value={paymentMethod}
-                  onChange={(e) =>
-                    setPaymentMethod(e.target.value as PaymentMethod)
-                  }
+                <h2 className="card-title text-gray-700 mb-4">
+                  Select Payment Method
+                </h2>
+
+                {/* Payment Gateway Option */}
+                <div
+                  className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
+                    paymentMethod === "PAYMENT_GATEWAY"
+                      ? "border-[#064749] bg-teal-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  onClick={() => setPaymentMethod("PAYMENT_GATEWAY")}
                 >
-                  <option value="PAYMENT_GATEWAY">
-                    Online Payment (Auto-confirm)
-                  </option>
-                  <option value="BANK_TRANSFER">
-                    Bank Transfer (Manual Confirmation)
-                  </option>
-                </select>
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="PAYMENT_GATEWAY"
+                      checked={paymentMethod === "PAYMENT_GATEWAY"}
+                      onChange={(e) =>
+                        setPaymentMethod(e.target.value as PaymentMethod)
+                      }
+                      className="radio radio-primary mt-1"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        💳 Online Payment (Recommended)
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-2">
+                        Instant booking confirmation
+                      </p>
+                      <div className="flex flex-wrap gap-2 items-center">
+                        <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-600">
+                          QRIS
+                        </span>
+                        <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-600">
+                          GoPay
+                        </span>
+                        <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-600">
+                          ShopeePay
+                        </span>
+                        <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-600">
+                          Bank Transfer
+                        </span>
+                        <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded border border-gray-600">
+                          Credit Card
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bank Transfer Option */}
+                <div
+                  className={`border-2 rounded-lg p-4 cursor-pointer transition-all mt-3 ${
+                    paymentMethod === "BANK_TRANSFER"
+                      ? "border-[#064749] bg-teal-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                  onClick={() => setPaymentMethod("BANK_TRANSFER")}
+                >
+                  <div className="flex items-start gap-3">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="BANK_TRANSFER"
+                      checked={paymentMethod === "BANK_TRANSFER"}
+                      onChange={(e) =>
+                        setPaymentMethod(e.target.value as PaymentMethod)
+                      }
+                      className="radio radio-primary mt-1"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 mb-1">
+                        🏦 Manual Bank Transfer
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Requires payment verification (up to 24 hours)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info Box */}
+                <div
+                  className={`mt-4 p-3 rounded-lg border ${
+                    paymentMethod === "PAYMENT_GATEWAY"
+                      ? "bg-green-50 border-green-200"
+                      : "bg-blue-50 border-blue-200"
+                  }`}
+                >
+                  <p className="text-sm">
                     {paymentMethod === "PAYMENT_GATEWAY" ? (
-                      <>
-                        <strong>Online Payment:</strong> Your booking will be
-                        automatically confirmed once payment is successful.
-                      </>
+                      <span className="text-green-800">
+                        ✓ <strong>Auto-confirmed:</strong> Your booking will be
+                        confirmed immediately after successful payment.
+                      </span>
                     ) : (
-                      <>
-                        <strong>Bank Transfer:</strong> You will receive bank
-                        details after booking. Your booking will be confirmed
-                        after we verify your payment.
-                      </>
+                      <span className="text-blue-800">
+                        ℹ️ <strong>Manual confirmation:</strong> You'll receive
+                        bank details. Your booking will be confirmed after we
+                        verify your payment (within 24 hours).
+                      </span>
                     )}
                   </p>
                 </div>
