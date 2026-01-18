@@ -95,6 +95,8 @@ export interface BookingResponse {
     paymentMethod: string | null;
     paidAt: string | null;
   }>;
+  paymentToken?: string | null;
+  paymentUrl?: string | null;
 }
 
 export interface ApiResponse<T> {

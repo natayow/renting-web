@@ -57,6 +57,29 @@ export default function ProfilePage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchBookings = async () => {
+    if (!session?.user?.accessToken) return;
+    if (session.user.role?.toUpperCase() !== "USER") return;
+
+    try {
+      setRefreshing(true);
+      const response = await axiosInstance.get(`/api/bookings/user/me`, {
+        headers: {
+          Authorization: `Bearer ${session.user.accessToken}`,
+        },
+      });
+
+      if (response.data.success) {
+        setBookings(response.data.data);
+      }
+    } catch (err: any) {
+      console.error("Error fetching bookings:", err);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -89,7 +112,7 @@ export default function ProfilePage() {
       }
     };
 
-    const fetchBookings = async () => {
+    const fetchBookingsInitial = async () => {
       if (!session?.user?.accessToken) return;
 
       if (session.user.role?.toUpperCase() !== "USER") return;
@@ -111,9 +134,25 @@ export default function ProfilePage() {
 
     if (session) {
       fetchProfile();
-      fetchBookings();
+      fetchBookingsInitial();
     }
   }, [session]);
+
+  // Auto-refresh bookings if there are any with WAITING_PAYMENT status
+  useEffect(() => {
+    const hasWaitingPayment = bookings.some(
+      (booking) => booking.status === "WAITING_PAYMENT"
+    );
+
+    if (!hasWaitingPayment || !session?.user?.accessToken) return;
+
+    // Poll every 5 seconds if there are bookings waiting for payment
+    const interval = setInterval(() => {
+      fetchBookings();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [bookings, session]);
 
   if (status === "loading" || loading) {
     return (
@@ -774,6 +813,16 @@ export default function ProfilePage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
                   My Bookings
                 </h2>
+
+                {bookings.some((b) => b.status === "WAITING_PAYMENT") && (
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm text-yellow-800">
+                      ⏱️ Auto-refreshing every 5 seconds to check payment
+                      status...
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   {bookings.map((booking) => (
                     <div
