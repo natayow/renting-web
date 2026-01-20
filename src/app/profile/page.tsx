@@ -21,6 +21,7 @@ interface UserProfile {
   phoneNumber?: string;
   dateOfBirth?: string;
   gender?: string;
+  pictureUrl?: string;
   role: string;
   createdAt: string;
   adminProfile?: {
@@ -229,9 +230,17 @@ export default function ProfilePage() {
           <div className="h-32 bg-linear-to-r from-[#064749] via-[#087174] to-[#0a9399]"></div>
           <div className="px-6 sm:px-4 pb-4">
             <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 -mt-16 sm:-mt-12">
-              <div className="w-32 h-32 rounded-full bg-linear-to-br from-[#064749] to-[#0a9399] flex items-center justify-center text-white text-4xl font-bold shadow-2xl border-4 border-white">
-                {profile && getInitials(profile.fullName)}
-              </div>
+              {profile?.pictureUrl ? (
+                <img
+                  src={`http://localhost:8000${profile.pictureUrl}`}
+                  alt={profile.fullName}
+                  className="w-32 h-32 rounded-full border-4 border-white shadow-2xl object-cover"
+                />
+              ) : (
+                <div className="w-32 h-32 rounded-full bg-linear-to-br from-[#064749] to-[#0a9399] flex items-center justify-center text-white text-4xl font-bold shadow-2xl border-4 border-white">
+                  {profile && getInitials(profile.fullName)}
+                </div>
+              )}
               <div className="flex-1 text-center sm:text-left mb-4 sm:mb-0">
                 <div className="flex items-center justify-center sm:justify-start gap-3 mb-2">
                   <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -269,7 +278,10 @@ export default function ProfilePage() {
                     Become a Tenant
                   </button>
                 )}
-                <button className="px-4 py-2 text-sm bg-linear-to-r from-[#064749] to-[#0a9399] text-white rounded-full hover:from-[#053638] hover:to-[#087174] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium">
+                <button
+                  onClick={() => router.push("/profile/edit")}
+                  className="px-4 py-2 text-sm bg-linear-to-r from-[#064749] to-[#0a9399] text-white rounded-full hover:from-[#053638] hover:to-[#087174] transition-all shadow-lg hover:shadow-xl flex items-center gap-2 font-medium"
+                >
                   <FaEdit />
                   Edit Profile
                 </button>
