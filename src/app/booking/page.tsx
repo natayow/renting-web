@@ -1,6 +1,9 @@
 import React, { Suspense } from "react";
 import BookingContent from "./BookingContent";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function BookingPage() {
   return (
     <Suspense
