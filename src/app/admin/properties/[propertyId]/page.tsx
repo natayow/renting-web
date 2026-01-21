@@ -121,8 +121,6 @@ export default function EditPropertyPage() {
         );
 
         setProperty(propertyResponse.data.data);
-        console.log("Property data:", propertyResponse.data.data);
-        console.log("Rooms:", propertyResponse.data.data.rooms);
 
         const typesResponse = await axiosInstance.get("/api/property-types");
         setPropertyTypes(typesResponse.data.data);
@@ -142,7 +140,6 @@ export default function EditPropertyPage() {
           facilityIds: prop.facilities?.map((f: any) => f.facility.id) || [],
         });
       } catch (err: any) {
-        console.error("Error fetching data:", err);
         toast.error(err.response?.data?.message || "Failed to load property");
       } finally {
         setLoading(false);
@@ -193,7 +190,6 @@ export default function EditPropertyPage() {
       setPendingFormValues(null);
       router.push("/admin/properties");
     } catch (err: any) {
-      console.error("Error updating property:", err);
       toast.error(err.response?.data?.message || "Failed to update property");
     } finally {
       setSaving(false);
@@ -221,7 +217,6 @@ export default function EditPropertyPage() {
       setDeleteRoomModalOpen(false);
       setRoomToDelete(null);
     } catch (err: any) {
-      console.error("Error deleting room:", err);
       toast.error(err.response?.data?.message || "Failed to delete room");
     }
   };

@@ -149,7 +149,6 @@ export default function PropertyDetailPage() {
         setError(response.data.message || "Failed to fetch property");
       }
     } catch (err: any) {
-      console.error("Error fetching property:", err);
       setError(err.response?.data?.message || "Failed to load property");
     } finally {
       setLoading(false);

@@ -73,7 +73,6 @@ export default function BookingSuccessPage() {
       // Refresh booking details after manual completion
       await fetchBookingDetails();
     } catch (err: any) {
-      console.error("Error completing payment:", err);
       setError(err.response?.data?.message || "Failed to complete payment");
     } finally {
       setCompleting(false);
@@ -99,7 +98,6 @@ export default function BookingSuccessPage() {
         setError(response.data.message);
       }
     } catch (err: any) {
-      console.error("Error fetching booking:", err);
       setError(err.response?.data?.message || "Failed to load booking details");
     } finally {
       setLoading(false);

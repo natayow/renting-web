@@ -13,26 +13,12 @@ export default function Page() {
   const onVerifyEmail = async () => {
     try {
       setVerifying(true);
-      console.log("=====================================");
-      console.log("🔍 Email Verification Process Started");
-      console.log("  Token from URL:", token);
-      console.log("  Token type:", typeof token);
-      console.log("  Token length:", token ? String(token).length : 0);
-      console.log("  API endpoint: /api/auth/verify-email");
-      console.log(
-        "  Full API URL:",
-        "http://localhost:8000/api/auth/verify-email"
-      );
-      console.log("=====================================");
 
       const response: any = await axiosInstance.get("/api/auth/verify-email", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      console.log("✅ Verification response:", response);
-      console.log("=====================================");
 
       setSuccess(true);
       toast.success(response?.data?.message || "Email verified successfully!");
@@ -41,10 +27,6 @@ export default function Page() {
         router.push("/login");
       }, 2000);
     } catch (error: any) {
-      console.error("❌ Verification error:", error);
-      console.error("  Error response:", error?.response?.data);
-      console.error("  Error status:", error?.response?.status);
-      console.log("=====================================");
       setSuccess(false);
       toast.error(
         error?.response?.data?.message ||

@@ -20,6 +20,7 @@ interface UserProfile {
 interface EditProfileFormData {
   fullName: string;
   phoneNumber: string;
+  email: string;
   picture?: File | null;
 }
 
@@ -27,6 +28,10 @@ const editProfileSchema = Yup.object().shape({
   fullName: Yup.string()
     .required("Full name is required")
     .max(80, "Full name must be at most 80 characters"),
+  email: Yup.string()
+    .required("Email is required")
+    .email("Invalid email format")
+    .max(120, "Email must be at most 120 characters"),
   phoneNumber: Yup.string()
     .max(20, "Phone number must be at most 20 characters")
     .nullable(),
@@ -73,7 +78,6 @@ export default function EditProfilePage() {
 
         setError("");
       } catch (err: any) {
-        console.error("Error fetching profile:", err);
         setError(err.response?.data?.message || "Failed to load profile");
       } finally {
         setLoading(false);
@@ -122,6 +126,10 @@ export default function EditProfilePage() {
       setError("");
       setSuccess("");
 
+      // Check if email has changed
+      const emailChanged = values.email !== profile?.email;
+
+      // First, update profile (name, phone, picture)
       const formData = new FormData();
       formData.append("fullName", values.fullName);
 
@@ -145,27 +153,70 @@ export default function EditProfilePage() {
         }
       );
 
-      if (response.data.success) {
-        setSuccess("Profile updated successfully!");
+      // If email changed, update email separately
+      if (emailChanged) {
+        try {
+          const emailResponse = await axiosInstance.put(
+            "/api/auth/user/email",
+            { email: values.email },
+            {
+              headers: {
+                Authorization: `Bearer ${session.user.accessToken}`,
+              },
+            }
+          );
 
-        // Update session with new data
-        await update({
-          ...session,
-          user: {
-            ...session.user,
-            fullName: response.data.data.fullName,
-            phoneNumber: response.data.data.phoneNumber,
-            pictureUrl: response.data.data.pictureUrl,
-          },
-        });
+          if (emailResponse.data.success) {
+            setSuccess(
+              "Profile updated successfully! A verification email has been sent to your new email address. Please verify to complete the change."
+            );
 
-        // Redirect back to profile page after 1 second
-        setTimeout(() => {
-          router.push("/profile");
-        }, 1000);
+            // Update session with new data
+            await update({
+              ...session,
+              user: {
+                ...session.user,
+                fullName: response.data.data.fullName,
+                phoneNumber: response.data.data.phoneNumber,
+                pictureUrl: response.data.data.pictureUrl,
+                email: values.email,
+                isVerified: false,
+              },
+            });
+
+            // Redirect back to profile page after 3 seconds
+            setTimeout(() => {
+              router.push("/profile");
+            }, 3000);
+          }
+        } catch (emailErr: any) {
+          setError(
+            emailErr.response?.data?.message ||
+              "Failed to update email. Profile changes were saved."
+          );
+        }
+      } else {
+        if (response.data.success) {
+          setSuccess("Profile updated successfully!");
+
+          // Update session with new data
+          await update({
+            ...session,
+            user: {
+              ...session.user,
+              fullName: response.data.data.fullName,
+              phoneNumber: response.data.data.phoneNumber,
+              pictureUrl: response.data.data.pictureUrl,
+            },
+          });
+
+          // Redirect back to profile page after 1 second
+          setTimeout(() => {
+            router.push("/profile");
+          }, 1000);
+        }
       }
     } catch (err: any) {
-      console.error("Error updating profile:", err);
       setError(err.response?.data?.message || "Failed to update profile");
     } finally {
       setSubmitting(false);
@@ -286,6 +337,7 @@ export default function EditProfilePage() {
             <Formik
               initialValues={{
                 fullName: profile?.fullName || "",
+                email: profile?.email || "",
                 phoneNumber: profile?.phoneNumber || "",
                 picture: null,
               }}
@@ -297,14 +349,14 @@ export default function EditProfilePage() {
                 <Form className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address
+                      Email Address <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <input
+                      <Field
                         type="email"
-                        value={profile?.email || ""}
-                        disabled
-                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-gray-500 cursor-not-allowed"
+                        name="email"
+                        className="w-full text-gray-600 pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#064749] focus:border-transparent transition-all"
+                        placeholder="Enter your email address"
                       />
                       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                         <svg
@@ -322,8 +374,14 @@ export default function EditProfilePage() {
                         </svg>
                       </div>
                     </div>
-                    <p className="mt-1 text-sm text-gray-500">
-                      Email address cannot be changed
+                    <ErrorMessage
+                      name="email"
+                      component="p"
+                      className="mt-1 text-sm text-red-500"
+                    />
+                    <p className="mt-1 text-sm text-amber-600">
+                      ⚠️ If you change your email, you will need to verify the
+                      new email address.
                     </p>
                   </div>
 

@@ -118,7 +118,6 @@ export default function BookingPage() {
         setPriceBreakdown(priceResponse.data.data);
       }
     } catch (err: any) {
-      console.error("Error fetching booking details:", err);
       setError(err.response?.data?.message || "Failed to load booking details");
     } finally {
       setCalculating(false);
@@ -130,9 +129,6 @@ export default function BookingPage() {
       setError("Price calculation not available");
       return;
     }
-
-    console.log("Session data:", session);
-    console.log("Access token:", session?.user?.accessToken);
 
     if (!session?.user?.accessToken) {
       setError("You must be logged in to complete booking");
@@ -154,11 +150,6 @@ export default function BookingPage() {
         paymentMethod,
       };
 
-      console.log(
-        "Sending booking with token:",
-        session.user.accessToken.substring(0, 20) + "..."
-      );
-
       const response = await axiosInstance.post<ApiResponse<BookingResponse>>(
         `/api/bookings`,
         bookingData,
@@ -177,26 +168,21 @@ export default function BookingPage() {
           if (window.snap) {
             window.snap.pay(booking.paymentToken, {
               onSuccess: function (result: any) {
-                console.log("Payment success:", result);
                 router.push(`/booking/success?bookingId=${booking.id}`);
               },
               onPending: function (result: any) {
-                console.log("Payment pending:", result);
                 router.push(`/booking/success?bookingId=${booking.id}`);
               },
               onError: function (result: any) {
-                console.log("Payment error:", result);
                 setError("Payment failed. Please try again.");
                 setLoading(false);
               },
               onClose: function () {
-                console.log("Payment popup closed");
                 setError("Payment cancelled. You can try again.");
                 setLoading(false);
               },
             });
           } else {
-            console.error("Midtrans Snap not loaded");
             setError("Payment system not ready. Please refresh the page.");
             setLoading(false);
           }
@@ -207,7 +193,6 @@ export default function BookingPage() {
         setError(response.data.message);
       }
     } catch (err: any) {
-      console.error("Error creating booking:", err);
       setError(err.response?.data?.message || "Failed to create booking");
     } finally {
       setLoading(false);
@@ -471,30 +456,6 @@ export default function BookingPage() {
                       </p>
                     </div>
                   </div>
-                </div>
-
-                {/* Info Box */}
-                <div
-                  className={`mt-4 p-3 rounded-lg border ${
-                    paymentMethod === "PAYMENT_GATEWAY"
-                      ? "bg-green-50 border-green-200"
-                      : "bg-blue-50 border-blue-200"
-                  }`}
-                >
-                  <p className="text-sm">
-                    {paymentMethod === "PAYMENT_GATEWAY" ? (
-                      <span className="text-green-800">
-                        ✓ <strong>Auto-confirmed:</strong> Your booking will be
-                        confirmed immediately after successful payment.
-                      </span>
-                    ) : (
-                      <span className="text-blue-800">
-                        ℹ️ <strong>Manual confirmation:</strong> You'll receive
-                        bank details. Your booking will be confirmed after we
-                        verify your payment (within 24 hours).
-                      </span>
-                    )}
-                  </p>
                 </div>
               </div>
             </div>

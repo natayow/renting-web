@@ -98,7 +98,6 @@ export default function PropertyManagementPage() {
         setFilteredProperties(response.data.data);
         setError("");
       } catch (err: any) {
-        console.error("Error fetching properties:", err);
         setError(err.response?.data?.message || "Failed to load properties");
         toast.error("Failed to load properties");
       } finally {
@@ -150,7 +149,6 @@ export default function PropertyManagementPage() {
       setDeleteModalOpen(false);
       setPropertyToDelete(null);
     } catch (err: any) {
-      console.error("Error deleting property:", err);
       toast.error(err.response?.data?.message || "Failed to delete property");
     }
   };
@@ -179,7 +177,6 @@ export default function PropertyManagementPage() {
       setStatusChangeModalOpen(false);
       setStatusChangeData(null);
     } catch (err: any) {
-      console.error("Error updating status:", err);
       toast.error(err.response?.data?.message || "Failed to update status");
     }
   };

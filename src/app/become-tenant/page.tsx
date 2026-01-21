@@ -59,7 +59,6 @@ export default function BecomeTenantPage() {
         }, 2000);
       }
     } catch (error: any) {
-      console.error("Error creating admin profile:", error);
       setSubmitError(
         error.response?.data?.message ||
           "Failed to create admin profile. Please try again."

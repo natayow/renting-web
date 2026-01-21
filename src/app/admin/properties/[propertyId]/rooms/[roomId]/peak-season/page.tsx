@@ -224,7 +224,6 @@ export default function PeakSeasonManagementPage() {
       );
       setAvailability(availabilityResponse.data.data);
     } catch (error: any) {
-      console.error("Error fetching data:", error);
       toast.error(error.response?.data?.message || "Failed to load data");
     } finally {
       setLoading(false);

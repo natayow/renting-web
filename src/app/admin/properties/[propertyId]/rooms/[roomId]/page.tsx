@@ -106,7 +106,6 @@ export default function EditRoomPage() {
             ) || [],
         });
       } catch (err: any) {
-        console.error("Error fetching data:", err);
         toast.error(err.response?.data?.message || "Failed to load data");
       } finally {
         setLoading(false);
@@ -152,7 +151,6 @@ export default function EditRoomPage() {
       setPendingFormValues(null);
       router.push(`/admin/properties/${propertyId}`);
     } catch (err: any) {
-      console.error("Error updating room:", err);
       toast.error(err.response?.data?.message || "Failed to update room");
     } finally {
       setSaving(false);

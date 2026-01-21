@@ -76,7 +76,7 @@ export default function ProfilePage() {
         setBookings(response.data.data);
       }
     } catch (err: any) {
-      console.error("Error fetching bookings:", err);
+      // Error silently handled
     } finally {
       setRefreshing(false);
     }
@@ -106,7 +106,6 @@ export default function ProfilePage() {
         setProfile(response.data.data);
         setError("");
       } catch (err: any) {
-        console.error("Error fetching profile:", err);
         setError(err.response?.data?.message || "Failed to load profile");
       } finally {
         setLoading(false);
@@ -129,7 +128,7 @@ export default function ProfilePage() {
           setBookings(response.data.data);
         }
       } catch (err: any) {
-        console.error("Error fetching bookings:", err);
+        // Error silently handled
       }
     };
 

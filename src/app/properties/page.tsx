@@ -104,7 +104,7 @@ export default function PropertiesPage() {
         setPropertyTypes(response.data.data);
       }
     } catch (err) {
-      console.error("Error fetching property types:", err);
+      // Error silently handled
     }
   };
 
@@ -135,7 +135,6 @@ export default function PropertiesPage() {
         setError(response.data.message || "Failed to fetch properties");
       }
     } catch (err: any) {
-      console.error("Error fetching properties:", err);
       setError(err.response?.data?.message || "Failed to load properties");
     } finally {
       setLoading(false);

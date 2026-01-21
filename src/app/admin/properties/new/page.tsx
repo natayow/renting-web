@@ -126,8 +126,6 @@ export default function NewPropertyPage() {
         router.push("/");
       }
     } catch (err: any) {
-      console.error("Error creating property:", err);
-      console.error("Error response:", err.response?.data);
       const errorMessage =
         err.response?.data?.message ||
         err.response?.data?.errors?.map((e: any) => e.msg).join(", ") ||
@@ -157,7 +155,6 @@ export default function NewPropertyPage() {
         setPropertyTypes(typesRes.data.data || []);
         setFacilities(facilitiesRes.data.data || []);
       } catch (err: any) {
-        console.error("Error fetching data:", err);
         setError("Failed to load property types or facilities");
       }
     };
