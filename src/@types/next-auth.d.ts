@@ -5,6 +5,9 @@ declare module "next-auth" {
     role: string;
     token: string;
     fullName: string;
+    isVerified?: boolean;
+    phoneNumber?: string;
+    pictureUrl?: string;
   }
 
   interface Session {
@@ -13,6 +16,9 @@ declare module "next-auth" {
       role: string;
       fullName: string;
       accessToken: string;
+      isVerified?: boolean;
+      phoneNumber?: string;
+      pictureUrl?: string;
     } & DefaultSession["user"];
   }
 
@@ -21,5 +27,8 @@ declare module "next-auth" {
     role: string;
     fullName: string;
     accessToken: string;
+    isVerified?: boolean;
+    phoneNumber?: string;
+    pictureUrl?: string;
   }
 }

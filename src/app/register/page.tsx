@@ -38,7 +38,6 @@ export default function Register() {
           error.response?.data?.message ||
           "Registration failed. Please try again.";
         toast.error(errorMessage);
-        console.error("Registration error:", error);
       } finally {
         setIsLoading(false);
         setSubmitting(false);

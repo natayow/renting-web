@@ -80,7 +80,6 @@ export default function NewRoomPage() {
         const facilitiesResponse = await axiosInstance.get("/api/facilities");
         setFacilities(facilitiesResponse.data.data);
       } catch (err: any) {
-        console.error("Error fetching data:", err);
         toast.error(err.response?.data?.message || "Failed to load data");
       } finally {
         setLoading(false);
@@ -123,7 +122,6 @@ export default function NewRoomPage() {
         toast.success("Room created successfully");
         router.push(`/admin/properties/${propertyId}`);
       } catch (err: any) {
-        console.error("Error creating room:", err);
         toast.error(err.response?.data?.message || "Failed to create room");
       } finally {
         setSaving(false);

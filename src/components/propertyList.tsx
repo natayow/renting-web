@@ -74,7 +74,6 @@ export default function PropertyList() {
         setError(response.data.message || "Failed to fetch properties");
       }
     } catch (err: any) {
-      console.error("Error fetching properties:", err);
       setError(err.response?.data?.message || "Failed to load properties");
     } finally {
       setLoading(false);

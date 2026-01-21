@@ -18,7 +18,7 @@ axiosInstance.interceptors.request.use(
                 }
             }
         } catch (error) {
-            console.error('Error getting session in axios interceptor:', error);
+            // Error silently handled
         }
         return config;
     },
@@ -31,8 +31,7 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            console.error('Unauthorized request:', error.config.url);
-           
+            // Unauthorized - handled by UI
         }
         return Promise.reject(error);
     }
